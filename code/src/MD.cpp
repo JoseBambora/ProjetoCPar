@@ -444,18 +444,12 @@ double Kinetic() { //Write Function here!
 // cache
 // simplificar
 
-// Miguel
-double PotentialAux(int i, int j)
+double PotentialAux(double sub1, double sub2, double sub3)
 {
-    double sub1 = r[i]-r[j];
-    double sub2 = r[i+1]-r[j+1];
-    double sub3 = r[i+2]-r[j+2];
-    double r2 = sub1 * sub1 + sub2 * sub2 + sub3 * sub3;
-    double rnorm = sqrt(r2);
-    double quot  = sigma/rnorm;
-    double term1 = pow(quot,12.);
-    double term2 = pow(quot,6.);
-    return 4*epsilon * (term1 - term2);
+    double quot = sigma / sqrt(sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
+    double quot6 = quot * quot * quot * quot * quot * quot;
+    double quot12 = quot6*quot6;
+    return 4 * epsilon * (quot12 - quot6);
 }
 
 // Function to calculate the potential energy of the system
@@ -467,14 +461,14 @@ double Potential() {
     }
     for (i=0; i<N; i++) {
         for (j=0; j<i; j++)
-            Pot[j] += PotentialAux(i,j);
+            Pot[j] += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
         for (j=i+1; j < N; j++)
-            Pot[j] += PotentialAux(i,j);
+            Pot[j] += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
     }
     double res = 0;
     for(int i = 0; i < N; i++)
     {
-        res += a[i];
+        res += Pot[i];
     }
     return res;
 }
