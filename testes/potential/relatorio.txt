@@ -1,4 +1,5 @@
 Sem otimizações do gcc:
+
 4663440.000000
 
  Performance counter stats for './old':
@@ -26,6 +27,7 @@ Sem otimizações do gcc:
 ==========================================================================
 
 Com otimizações do gcc:
+
 4663440.000000
 
  Performance counter stats for './old':
