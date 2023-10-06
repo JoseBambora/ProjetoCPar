@@ -443,8 +443,7 @@ double PotentialAux(double sub1, double sub2, double sub3)
 {
     double quot = sigma / sqrt(sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
     double quot6 = quot * quot * quot * quot * quot * quot;
-    double quot12 = quot6*quot6;
-    return 4 * epsilon * (quot12 - quot6);
+    return quot6 * quot6 - quot6;
 }
 
 // Function to calculate the potential energy of the system
@@ -466,7 +465,7 @@ double Potential() {
     {
         res += Pot[i];
     }
-    return res;
+    return 4 * epsilon * res;
 }
 
 
