@@ -437,12 +437,7 @@ double Kinetic() { //Write Function here!
     }
     //printf("  Total Kinetic Energy is %f\n",N*mvs*m/2.);
     return kin;
-    
 }
-
-// vetorização
-// cache
-// simplificar
 
 double PotentialAux(double sub1, double sub2, double sub3)
 {
@@ -459,11 +454,12 @@ double Potential() {
     for (int i = 0; i < N; i++) {
         Pot[i] = 0.0;
     }
-    for (i=0; i<N; i++) {
-        for (j=0; j<i; j++)
-            Pot[j] += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
-        for (j=i+1; j < N; j++)
-            Pot[j] += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
+    for (i=0; i<3*N; i+=3) {
+        int aux = 0;
+        for (j=0; j<i; j+=3, aux++)
+            Pot[aux] += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
+        for (j=i+3; j < N*3; j+=3, aux++)
+            Pot[aux] += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
     }
     double res = 0;
     for(int i = 0; i < N; i++)
@@ -476,8 +472,7 @@ double Potential() {
 
 //   Uses the derivative of the Lennard-Jones potential to calculate
 //   the forces on each atom.  Then uses a = F/m to calculate the
-//   accelleration of each atom. 
-// José
+//   accelleration of each atom.
 void computeAccelerations() {
     int i, j;
     double rij0, rij1, rij2, rSqd, rSqd3, f;

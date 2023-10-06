@@ -1,0 +1,1000 @@
+ 1101  npm start
+ 1102  ps -a
+ 1103  cd DataServer/
+ 1104  cd DataServer/Tests/
+ 1105  python3 tests.py 
+ 1106  mongosh
+ 1107  clear
+ 1108  python3 tests.py 
+ 1109  mongosh
+ 1110  python3 tests.py 
+ 1111  mongosh
+ 1112  python3 tests.py 
+ 1113  mongosh
+ 1114  python3 tests.py 
+ 1115  mongosh
+ 1116  python3 tests.py 
+ 1117  mongosh
+ 1118  python3 tests.py 
+ 1119  mongosh
+ 1120  python3 tests.py 
+ 1121  mongosh
+ 1122  python3 tests.py 
+ 1123  mongosh
+ 1124  python3 tests.py 
+ 1125  mongosh
+ 1126  python3 tests.py 
+ 1127  mongosh
+ 1128  python3 tests.py 
+ 1129  mongosh
+ 1130  clear
+ 1131  python3 tests.py 
+ 1132  mongosh
+ 1133  rm -r __pycache__/
+ 1134  cd ..
+ 1135  ls
+ 1136  cd ..
+ 1137  git add DataServer/
+ 1138  git commit -m "Finished the test of adding a new event, and tested login and register process."
+ 1139  git push
+ 1140  clear
+ 1141  cd DataServer/Tests/
+ 1142  python3 tests.py 
+ 1143  mongosh
+ 1144  python3 tests.py 
+ 1145  mongosh
+ 1146  python3 tests.py 
+ 1147  mongosh
+ 1148  python3 tests.py 
+ 1149  mongosh
+ 1150  python3 tests.py 
+ 1151  mongosh
+ 1152  python3 tests.py 
+ 1153  mongosh
+ 1154  python3 tests.py 
+ 1155  mongosh
+ 1156  python3 tests.py 
+ 1157  mongosh
+ 1158  python3 tests.py 
+ 1159  mongosh
+ 1160  python3 tests.py 
+ 1161  mongosh
+ 1162  python3 tests.py 
+ 1163  rm -r __pycache__/
+ 1164  cd ..
+ 1165  git add DataServer/
+ 1166  git commit -m "Tested the open, close and cancel event operations, with authentication."
+ 1167  git push
+ 1168  cd DataServer/Tests/
+ 1169  python3 tests.py 
+ 1170  rm -r __pycache__/
+ 1171  cd ..
+ 1172  git add DataServer/
+ 1173  git commit -m "Simplified the testing code."
+ 1174  git push
+ 1175  cd Projetos/EventsApp/DataServer/Server/
+ 1176  npm start
+ 1177  cd Projetos/EventsApp/DataServer/APIAuth/
+ 1178  npm start
+ 1179  cd Projetos/EventsApp/DataServer/APIData/
+ 1180  npm start
+ 1181  cd Projetos/EventsApp/DataServer/APIAuth/
+ 1182  npm start
+ 1183  cd Projetos/EventsApp/DataServer/APIData/
+ 1184  npm start
+ 1185  cd Projetos/EventsApp/
+ 1186  git pull
+ 1187  cd DataServer/Server/
+ 1188  npm start
+ 1189  cd DataServer/Tests/
+ 1190  python3 tests.py 
+ 1191  [A
+ 1192  python3 tests.py 
+ 1193  mongodb
+ 1194  mongosh
+ 1195  python3 tests.py 
+ 1196  mongosh
+ 1197  python3 tests.py 
+ 1198  mongosh
+ 1199  clear
+ 1200  python3 tests.py 
+ 1201  mongosh
+ 1202  python3 tests.py 
+ 1203  mongosh
+ 1204  python3 tests.py 
+ 1205  mongosh
+ 1206  python3 tests.py 
+ 1207  mongosh
+ 1208  python3 tests.py 
+ 1209  git add tests.py utils.py 
+ 1210  cd ..
+ 1211  git add APIData/ Server/
+ 1212  git commit -m "Finished the tests. The Data Server is full tested right now, and it is 100% working, unless there is something that escaped me."
+ 1213  git push
+ 1214  cd ..
+ 1215  cd Projetos/
+ 1216  ls
+ 1217  rm -r EventsAppCopy/
+ 1218  ls
+ 1219  mkdir CP
+ 1220  cd CP/
+ 1221  mkdir PL1
+ 1222  cd PL1/
+ 1223  gcc matrix.c 
+ 1224  ./a.out 
+ 1225  gcc matrix.c 
+ 1226  ./a.out 
+ 1227  gcc matrix.c 
+ 1228  ./a.out 
+ 1229  gcc matrix.c 
+ 1230  ./a.out 
+ 1231  gcc matrix.c 
+ 1232  ./a.out 
+ 1233  gcc matrix.c 
+ 1234  ./a.out 
+ 1235  gcc matrix.c 
+ 1236  ./a.out 
+ 1237  gcc matrix.c 
+ 1238  ./a.out 
+ 1239  gcc matrix.c 
+ 1240  ./a.out 
+ 1241  gcc matrix.c 
+ 1242  ./a.out 
+ 1243  gcc matrix.c 
+ 1244  ./a.out 
+ 1245  gcc matrix.c 
+ 1246  ./a.out 
+ 1247  gcc matrix.c 
+ 1248  ./a.out 
+ 1249  gcc matrix.c 
+ 1250  ./a.out 
+ 1251  gcc matrix.c 
+ 1252  ./a.out 
+ 1253  gcc matrix.c 
+ 1254  ./a.out 
+ 1255  gcc matrix.c 
+ 1256  ./a.out 
+ 1257  gcc matrix.c 
+ 1258  ./a.out 
+ 1259  gcc matrix.c 
+ 1260  ./a.out 
+ 1261  gcc matrix.c 
+ 1262  ./a.out 
+ 1263  gcc matrix.c 
+ 1264  ./a.out 
+ 1265  gcc matrix.c 
+ 1266  ./a.out 
+ 1267  gcc matrix.c 
+ 1268  ./a.out 
+ 1269  gcc matrix.c 
+ 1270  ./a.out 
+ 1271  gcc matrix.c 
+ 1272  ./a.out 
+ 1273  gcc matrix.c 
+ 1274  ./a.out 
+ 1275  gcc matrix.c 
+ 1276  ./a.out 
+ 1277  gcc matrix.c 
+ 1278  ./a.out 
+ 1279  gcc matrix.c 
+ 1280  ./a.out 
+ 1281  gcc matrix.c 
+ 1282  ./a.out 
+ 1283  gcc matrix.c 
+ 1284  ./a.out 
+ 1285  gcc matrix.c 
+ 1286  ./a.out 
+ 1287  gcc matrix.c 
+ 1288  ./a.out 
+ 1289  ssh s7edu.di.uminho.pt
+ 1290  ssh "s7edu.di.uminho.pt"
+ 1291  ssh pg53975@s7edu.di.uminho.pt
+ 1292  scp matrix.c pg53975@s7edu.di.uminho.pt
+ 1293  ssh pg53975@s7edu.di.uminho.pt
+ 1294  gcc matrix.c 
+ 1295  cd CP/PL1/
+ 1296  gcc matrix.c 
+ 1297  ./a.out 
+ 1298  gcc matrix.c 
+ 1299  ./a.out 
+ 1300  gcc matrix.c 
+ 1301  ./a.out 
+ 1302  gcc matrix.c 
+ 1303  ./a.out 
+ 1304  gcc matrix.c 
+ 1305  ./a.out 
+ 1306  gcc matrix.c 
+ 1307  ./a.out 
+ 1308  gcc matrix.c 
+ 1309  ./a.out 
+ 1310  gcc matrix.c 
+ 1311  ./a.out 
+ 1312  gcc matrix.c 
+ 1313  ./a.out 
+ 1314  gcc matrix.c 
+ 1315  ./a.out 
+ 1316  gcc matrix.c 
+ 1317  ./a.out 
+ 1318  gcc matrix.c 
+ 1319  ./a.out 
+ 1320  gcc matrix.c 
+ 1321  ./a.out 
+ 1322  ssh pg53975@s7edu.di.uminho.pt
+ 1323  sudo apt install linux-tools-common
+ 1324  uname -r
+ 1325  sudo apt install linux-tools-5.15.0-79-generic
+ 1326  cd CP/PL1/
+ 1327  ls
+ 1328  gcc matrix.c
+ 1329  perf ./a.out 
+ 1330  man perf
+ 1331  perf stat -e instructions,cycles ./a.out
+ 1332  ./a.out 
+ 1333  perf stat ./a.out 
+ 1334  perf stat -e instructions,cycles ./a.out
+ 1335  sudo perf stat -e instructions,cycles ./a.out
+ 1336  cd ..
+ 1337  clear
+ 1338  pip install python-sat[aiger,approxmc,pblib]
+ 1339  python3 -m pip install --upgrade pip
+ 1340  pip install python-sat[aiger,approxmc,pblib]
+ 1341  mkdir DAA
+ 1342  mv Transferências/Miniconda3-latest-Linux-x86_64.sh DAA/
+ 1343  cd DAA/
+ 1344  sha256sum Miniconda3-latest-Linux-x86_64.sh 
+ 1345  bash Miniconda3-latest-Linux-x86_64.sh 
+ 1346  conda list
+ 1347  cd DAA/
+ 1348  conda list
+ 1349  conda init
+ 1350  cd DAA/
+ 1351  ls
+ 1352  rm Miniconda3-latest-Linux-x86_64.sh 
+ 1353  ls
+ 1354  cd ..
+ 1355  conda lsit
+ 1356  conda list
+ 1357  conda create --name DAA python==3.10 numpy pandas xlrd xlwt matplotlib seaborn scikit-learn jupyterlab
+ 1358  clear
+ 1359  conda activate DAA
+ 1360  jupyter lab
+ 1361  conda deactivate
+ 1362  sudo apt purge google-chrome-stable
+ 1363  conda activate DAA
+ 1364  jupyter lab
+ 1365  pip install discord.py
+ 1366  mkdir BotDiscord
+ 1367  cd BotDiscord/
+ 1368  python3 bot.py 
+ 1369  ps -a
+ 1370  python3 bot.py 
+ 1371  pip install regex
+ 1372  python3 bot.py 
+ 1373  python ngame.py 
+ 1374  result = list(map(lambda a: a[0],filter(lambda aposta: aposta[1] == jogo['resultado'],list_of_tuples)))
+ 1375  conda activate base
+ 1376  /home/josebambora/miniconda3/bin/python
+ 1377  result = f'As pessoas que acertaram foram:\n'
+ 1378  cd BotDiscord/
+ 1379  python3 ngame.py 
+ 1380  python3 bot.py 
+ 1381  mkdir MF
+ 1382  pip install z3-solver
+ 1383  cd MF/aula2/
+ 1384  python3 ex4.py 
+ 1385  cd MF/aula2/
+ 1386  python3 ex4.py 
+ 1387  cd CP/PL3/
+ 1388  perf stat -e L1-dcache-load-misses -M cpi ./a.out
+ 1389  sudp perf stat -e L1-dcache-load-misses -M cpi ./a.out
+ 1390  sudo perf stat -e L1-dcache-load-misses -M cpi ./a.out
+ 1391  perf --version
+ 1392  conda deactivate
+ 1393  sudo perf stat -e L1-dcache-load-misses -M cpi ./a.out
+ 1394  cd PL3/
+ 1395  gcc -O2 mmult.c 
+ 1396  perf stat -e
+ 1397  perf stat -e L1-dcache-load-misses -M cpi ./a.out
+ 1398  cd PL3/
+ 1399  perf stat -e L1-dcache-load-misses -M cpi ./a.out
+ 1400  sudo perf stat -e L1-dcache-load-misses -M cpi ./a.out
+ 1401  gcc -O2 mmult.c 
+ 1402  ssh 
+ 1403  man perf
+ 1404  sudo perf stat -e cycles,instructions ./a.out
+ 1405  sudo perf stat -e L1-dcache-load-misses -M cpi ./a.out
+ 1406  perf list
+ 1407  perf --version
+ 1408  sudo apt install linux-tools-common
+ 1409  perf --version
+ 1410  uname -r
+ 1411  sudo apt install linux-tools-5.15.0-84-generic
+ 1412  ssh pg53975@s7edu.di.uminho.pt
+ 1413  ls
+ 1414  cd ..
+ 1415  cd 
+ 1416  mv Transferências/daa_pl_2.ipynb DAA/
+ 1417  mv Transferências/titanic_dataset\(1\).csv DAA/
+ 1418  cd DAA/
+ 1419  ls
+ 1420  conda activate DAA
+ 1421  jupyter-lab daa_pl_2.ipynb 
+ 1422  cd BotDiscord/
+ 1423  python ngame.py 
+ 1424  vi apostas.json 
+ 1425  python3 bot.py 
+ 1426  vi apostas.json 
+ 1427  python3 bot.py 
+ 1428  vi bot.py 
+ 1429  vi utils.py 
+ 1430  mv Transferências/CallsData.xls DAA/Aula2/
+ 1431  mv Transferências/ContractData.csv DAA/Aula2/
+ 1432  cd Transferências/
+ 1433  ls
+ 1434  rm Projeto_EW.pdf users.js mmult.c 
+ 1435  ls
+ 1436  cd DAA/.ipynb_checkpoints/
+ 1437  CD ..
+ 1438  LS
+ 1439  cd ..
+ 1440  ls
+ 1441  cp daa_pl_2.ipynb ficha.ipynb
+ 1442  mv * Aula2/
+ 1443  ls
+ 1444  mkdir Aula2
+ 1445  mv * Aula2/
+ 1446  cd
+ 1447  cd DAA/Aula2/
+ 1448  ls
+ 1449  conda activate DAA
+ 1450  jupyter-lab ficha.ipynb 
+ 1451  jupyter-lab ficha2.ipynb 
+ 1452  conda deactivate
+ 1453  cd PL3/
+ 1454  gcc -O2 mmult.c
+ 1455  ./a.out 
+ 1456  gcc -O2 mmult.c
+ 1457  ./a.out 
+ 1458  gcc -O2 mmult.c
+ 1459  ./a.out 
+ 1460  gcc -O2 mmult.c
+ 1461  ./a.out 
+ 1462  ssh pg53975@s7edu.di.uminho.pt
+ 1463  cd Trabalho/code/
+ 1464  make clean
+ 1465  make run
+ 1466  ls
+ 1467  make
+ 1468  make run
+ 1469  cd CP/
+ 1470  mkdir Trabalho
+ 1471  cd ..
+ 1472  mv Transferências/code.zip CP/Trabalho/
+ 1473  cd CP/Trabalho/
+ 1474  unzip code.zip 
+ 1475  ls
+ 1476  rm -r __MACOSX/
+ 1477  ls
+ 1478  rm code
+ 1479  rm code.zip 
+ 1480  ls
+ 1481  cd code/
+ 1482  ls
+ 1483  gcc -pg src/MD.cpp
+ 1484  gcc -pg -lm src/MD.cpp
+ 1485  g++ -pg -lm src/MD.cpp
+ 1486  ls
+ 1487  gprof a.out 
+ 1488  gprof ./a.out 
+ 1489  g++ -pg -lm src/MD.cpp -o gmon.out
+ 1490  ls
+ 1491  rm a.out 
+ 1492  ./gmon.out 
+ 1493  perf record -g -- MD.exe 
+ 1494  sudo perf record -g -- MD.exe 
+ 1495  cd ..
+ 1496  cd code/
+ 1497  ls
+ 1498  rm gmon.out MD.exe 
+ 1499  ls
+ 1500  cd ..
+ 1501  scp code/ pg53975@s7edu.di.uminho.pt
+ 1502  scp -r code/ pg53975@s7edu.di.uminho.pt
+ 1503  ssh pg53975@s7edu.di.uminho.pt
+ 1504  scp -r code/ pg53975@s7edu.di.uminho.pt:
+ 1505  ssh pg53975@s7edu.di.uminho.pt
+ 1506  cd ..
+ 1507  cd Trabalho/code/
+ 1508  ls
+ 1509  make
+ 1510  make run
+ 1511  make
+ 1512  make run
+ 1513  gprof --version
+ 1514  make
+ 1515  ls
+ 1516  ls -la
+ 1517  make clean
+ 1518  make
+ 1519  gprof MD.exe 
+ 1520  make run
+ 1521  make clean
+ 1522  make
+ 1523  make run
+ 1524  gprof 
+ 1525  gprof gmon.out 
+ 1526  gprof MD.exe 
+ 1527  ls la
+ 1528  ls -la
+ 1529  rm gmon.out 
+ 1530  ls
+ 1531  make run
+ 1532  gprof gmon.out > relatorio.txt
+ 1533  gprof MD.exe > relatorio.txt
+ 1534  gprof2dot --version
+ 1535  pip install gprof2dot
+ 1536  gprof2dot relatorio.txt 
+ 1537  gprof MD.exe > relatorio2.txt
+ 1538  make clean
+ 1539  make
+ 1540  make run
+ 1541  gprof MD.exe > relatorio3.txt
+ 1542  mkdir relatorios
+ 1543  mv relatorio.txt relatorios/
+ 1544  mv relatorio2.txt relatorios/
+ 1545  mv relatorio3.txt relatorios/
+ 1546  make run
+ 1547  gprof MD.exe > relatorios/relatorio3.txt
+ 1548  make clean
+ 1549  make
+ 1550  make run
+ 1551  gprof MD.exe > relatorios/relatorio3.txt
+ 1552  make clean
+ 1553  make run
+ 1554  make 
+ 1555  make run
+ 1556  gprof MD.exe > relatorios/relatorio3.txt
+ 1557  make clean
+ 1558  make
+ 1559  make run
+ 1560  gprof MD.exe > relatorios/relatorio4.txt
+ 1561  make clean
+ 1562  make 
+ 1563  make run
+ 1564  gprof MD.exe > relatorios/relatorio5.txt
+ 1565  perf stat -e L1-dcache-load-misses -M cpi MD.exe 
+ 1566  sudo perf stat -e L1-dcache-load-misses -M cpi MD.exe 
+ 1567  sudo perf stat -e L1-dcache-load-misses -M cpi ./MD.exe 
+ 1568  cd 
+ 1569  mv Transferências/code.zip CP/Trabalho/
+ 1570  cd CP/Trabalho/
+ 1571  ls
+ 1572  mkdir Original
+ 1573  mv code.zip Original/
+ 1574  cd Original/
+ 1575  unzip code.zip 
+ 1576  rm -r __MACOSX/
+ 1577  ls
+ 1578  rm code.zip 
+ 1579  cd code/
+ 1580  ls
+ 1581  make
+ 1582  make clean
+ 1583  make
+ 1584  make run
+ 1585  cd ..
+ 1586  cd code/
+ 1587  make clean
+ 1588  make
+ 1589  make run
+ 1590  make clean
+ 1591  make
+ 1592  make run
+ 1593  make clean
+ 1594  make
+ 1595  make run
+ 1596  make clean
+ 1597  make
+ 1598  make run
+ 1599  make clean
+ 1600  make
+ 1601  make run
+ 1602  rm are_average.txt 
+ 1603  rm are_output.txt 
+ 1604  rm are_traj.xyz 
+ 1605  gprof MD.exe > relatorios/relatorio6.txt
+ 1606  cd ..
+ 1607  cd Original/code/
+ 1608  mkdir relatorios
+ 1609  gprof MD.exe > relatorios/relatorio6.txt
+ 1610  cd ..
+ 1611  sudo perf stat -e L1-dcache-load-misses -M cpi make run
+ 1612  cd 
+ 1613  cd CP/Trabalho/code/
+ 1614  sudo perf stat -e L1-dcache-load-misses -M cpi ./MD.exe 
+ 1615  cd ..
+ 1616  cd Original/code/
+ 1617  sudo perf stat -e L1-dcache-load-misses -M cpi ./MD.exe 
+ 1618  cd ..
+ 1619  git clone https://github.com/JoseBambora/ProjetoCPar.git
+ 1620  mv Trabalho/code/ ProjetoCPar/
+ 1621  cd ProjetoCPar/
+ 1622  ls
+ 1623  git add code/
+ 1624  git commit -m "We did some optimizations."
+ 1625  git push
+ 1626  cd MF/aula3/
+ 1627  python3 ex3.py 
+ 1628  python3 ex4.py 
+ 1629  cd BotDiscord/
+ 1630  python3 bot.py 
+ 1631  python3 ngame.py 
+ 1632  python3 bot.py 
+ 1633  cd CP/
+ 1634  ls
+ 1635  mkdir PL4
+ 1636  cd PL4/
+ 1637  ls
+ 1638  mv Transferências/mmult.c CP/PL4/
+ 1639  cd CP/PL4/
+ 1640  ls
+ 1641  gcc -O2 mmult.c -o sem_vetorizacao
+ 1642  ls
+ 1643  gcc -O2 mmult.c -ftree-vectorize -msse4 -o com_vetorizacao
+ 1644  ls
+ 1645  sudo perf stat L1-dcache-load-misses -M cpi ./sem_vetorizacao 
+ 1646  sudo perf stat -L1-dcache-load-misses -M cpi ./sem_vetorizacao 
+ 1647  sudo perf stat -e L1-dcache-load-misses -M cpi ./sem_vetorizacao 
+ 1648  sudo perf stat -e L1-dcache-load-misses -M cpi ./com_vetorizacao 
+ 1649  gcc -O2 mmult.c -ftree-vectorize -msse4 -s com_vetorizacao
+ 1650  ls
+ 1651  gcc -O2 mmult.c -ftree-vectorize -msse4 -S com_vetorizacao
+ 1652  ls
+ 1653  more mmult.s
+ 1654  gcc -O2 mmult.c -S sem_vetorizacao
+ 1655  gcc -O2 mmult.c -S sem_vetorizacao.s
+ 1656  ls
+ 1657  gcc -O2 mmult.c -S -o sem_vetorizacao.s
+ 1658  gcc -O2 mmult.c -ftree-vectorize -msse4 -S -o com_vetorizacao
+ 1659  ls
+ 1660  rm mmult.s 
+ 1661  gcc -O2 mmult.c -ftree-vectorize -msse4 -S -o com_vetorizacao.s
+ 1662  ls
+ 1663  gcc -O2 mmult.c -ftree-vectorize -msse4 -o com_vetorizacao
+ 1664  ssh pg53975@s7edu.di.uminho.pt
+ 1665  scp mmult.c  pg53975@s7edu.di.uminho.pt
+ 1666  scp mmult.c  pg53975@s7edu.di.uminho.pt:
+ 1667  ssh pg53975@s7edu.di.uminho.pt
+ 1668  cd CP/
+ 1669  ls
+ 1670  cd ProjetoCPar/
+ 1671  ls
+ 1672  mkdir testes
+ 1673  cd testes/potential/
+ 1674  gcc -O2 --
+ 1675  gcc -O2 -funroll-loops -mavx old.c 
+ 1676  sudo perf stat -L1-dcache-load-misses -M cpi ./a.out 
+ 1677  sudo perf stat -e L1-dcache-load-misses -M cpi ./a.out 
+ 1678  gcc -O2 -funroll-loops -mavx old.c -o old
+ 1679  rm a.out 
+ 1680  gcc -O2 -funroll-loops -mavx new.c -o new
+ 1681  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1682  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1683  gcc -O2 -funroll-loops -mavx new.c -o new
+ 1684  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1685  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1686  gcc -O2 -funroll-loops -mavx new.c -o new
+ 1687  gcc -O2 -funroll-loops -mavx old.c -o old
+ 1688  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1689  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1690  gcc -O2 -mavx new.c -o new
+ 1691  gcc -O2 -mavx old.c -o old
+ 1692  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1693  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1694  gcc -O2 -mavx new.c -o new
+ 1695  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1696  gcc -O2 -mavx new.c -o new
+ 1697  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1698  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1699  gcc -O2 -mavx new.c -o new
+ 1700  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1701  gcc -O2 -mavx new.c -o new
+ 1702  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1703  gcc -O2 -mavx new.c -o new
+ 1704  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1705  ./new 
+ 1706  gcc -O2 -mavx new.c -o new
+ 1707  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1708  ./new 
+ 1709  gcc -O2 -mavx new.c -o new
+ 1710  ./new 
+ 1711  gcc -O2 -mavx new.c -o new
+ 1712  ./new 
+ 1713  gcc -O2 -mavx new.c -o new
+ 1714  ./new 
+ 1715  gcc -O2 -mavx new.c -o new
+ 1716  ./new 
+ 1717  gcc -O2 -mavx new.c -o new
+ 1718  ./new 
+ 1719  gcc -O2 -mavx new.c -o new
+ 1720  ./new 
+ 1721  gcc -O2 new.c -o new
+ 1722  ./new 
+ 1723  gcc -O2 new.c -o new
+ 1724  ./new 
+ 1725  gcc -O2 new.c -o new
+ 1726  ./new 
+ 1727  gcc -O2 new.c -o new
+ 1728  ./new 
+ 1729  gcc -O2 -mavx new.c -o new
+ 1730  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1731  ./new 
+ 1732  gcc -O2 -mavx new.c -o new
+ 1733  ./new 
+ 1734  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1735  gcc -O2 -mavx new.c -o new
+ 1736  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1737  gcc -O2 -mavx new.c -o new
+ 1738  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1739  gcc -O2 -mavx new.c -o new
+ 1740  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1741  gcc -O2 -mavx new.c -o new
+ 1742  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1743  gcc -O2 -mavx new.c -o new
+ 1744  ./new 
+ 1745  gcc -O2 -mavx new.c -o new
+ 1746  ./new 
+ 1747  gcc -O2 -mavx new.c -o new
+ 1748  ./new 
+ 1749  gcc -O2 -mavx new.c -o new
+ 1750  ./new 
+ 1751  gcc -O2 -mavx new.c -o new
+ 1752  ./new 
+ 1753  gcc -O2 -mavx new.c -o new
+ 1754  ./new 
+ 1755  gcc -O2 -mavx new.c -o new
+ 1756  ./new 
+ 1757  gcc new.c -o new
+ 1758  ./new 
+ 1759  gcc new.c -o new
+ 1760  ./new 
+ 1761  gcc -O2 -mavx new.c -o new
+ 1762  ./new 
+ 1763  gcc -O3 -mavx new.c -o new
+ 1764  ./new 
+ 1765  gcc -O3 -mavx new.c -o new
+ 1766  ./new 
+ 1767  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1768  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1769  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1770  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1771  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1772  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1773  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1774  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1775  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1776  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1777  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1778  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1779  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1780  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1781  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1782  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1783  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1784  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1785  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1786  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1787  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1788  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1789  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1790  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1791  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1792  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1793  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1794  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1795  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1796  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1797  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1798  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1799  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1800  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1801  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1802  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1803  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1804  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1805  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1806  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1807  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1808  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1809  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1810  cd CP/Trabalho/
+ 1811  ls
+ 1812  cd ..
+ 1813  cd ProjetoCPar/
+ 1814  cd testes/
+ 1815  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1816  ls
+ 1817  cd potential/
+ 1818  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1819  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1820  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1821  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1822  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1823  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1824  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1825  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1826  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1827  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1828  gcc old.c -o old
+ 1829  gcc new.c -o new
+ 1830  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1831  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1832  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1833  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1834  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1835  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1836  rm new old
+ 1837  ls
+ 1838  cd ..
+ 1839  git add testes/
+ 1840  git commit -m "Tested new version of potential function"
+ 1841  git push
+ 1842  cd ..
+ 1843  cp Trabalho/Original/ ProjetoCPar/
+ 1844  cp -r Trabalho/Original/ ProjetoCPar/
+ 1845  cd ProjetoCPar/code/
+ 1846  make
+ 1847  make clean
+ 1848  make
+ 1849  make run
+ 1850  make clean
+ 1851  make
+ 1852  make run
+ 1853  make clean
+ 1854  make
+ 1855  make run
+ 1856  cd ..
+ 1857  cd Original/code/
+ 1858  make clean
+ 1859  make
+ 1860  make clean
+ 1861  make
+ 1862  make run
+ 1863  make clean
+ 1864  make
+ 1865  make run
+ 1866  cd ..
+ 1867  cd code/
+ 1868  make clean
+ 1869  make
+ 1870  make run
+ 1871  cd ..
+ 1872  cd Original/code/
+ 1873  make clean
+ 1874  make
+ 1875  make run
+ 1876  make clean
+ 1877  make
+ 1878  make run
+ 1879  cd ..
+ 1880  cd code/
+ 1881  make clean
+ 1882  make 
+ 1883  make run
+ 1884  make clean
+ 1885  make
+ 1886  make run
+ 1887  cd ..
+ 1888  cd Original/code/
+ 1889  make clean
+ 1890  make
+ 1891  make run
+ 1892  cd ..
+ 1893  cd code/
+ 1894  make clean
+ 1895  make 
+ 1896  make run
+ 1897  make clean
+ 1898  make
+ 1899  make run
+ 1900  cd ..
+ 1901  cd Original/code/
+ 1902  make clean
+ 1903  make
+ 1904  make run
+ 1905  make clean
+ 1906  make
+ 1907  make run
+ 1908  cd ..
+ 1909  cd code/
+ 1910  make clean
+ 1911  make
+ 1912  make run
+ 1913  make clean
+ 1914  make
+ 1915  make run
+ 1916  make clean
+ 1917  make
+ 1918  make run
+ 1919  make clean
+ 1920  make
+ 1921  make run
+ 1922  make clean
+ 1923  make
+ 1924  make run
+ 1925  make clean
+ 1926  ls
+ 1927  make 
+ 1928  make run
+ 1929  gprof gmon.out 
+ 1930  gprof ./MD.exe 
+ 1931  gprof ./MD.exe > relatorios/relatorio7.txt
+ 1932  cd ..
+ 1933  cd testes/
+ 1934  cd ..
+ 1935  git add code/ testes/
+ 1936  git commit -m "Improved the code, in order to use vectorizations."
+ 1937  git push
+ 1938  cd testes/
+ 1939  mkdir computeaccelerations
+ 1940  cd computeaccelerations/
+ 1941  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1942  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1943  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1944  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1945  gcc -O3 -funroll-loops -mavx new.c -o new
+ 1946  gcc -O3 -funroll-loops -mavx old.c -o old
+ 1947  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 1948  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 1949  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1950  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 1951  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 1952  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1953  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1954  cd CP/ProjetoCPar/testes/
+ 1955  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 1956  cd computeaccelerations/
+ 1957  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 1958  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 1959  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1960  sudo apt install linux-tools-common
+ 1961  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1962  sudo apt install linux-tools-generic
+ 1963  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1964  sudo apt install linux-tools-5.15.0-86-generic
+ 1965  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1966  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1967  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 1968  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 1969  scp new.c pg53975@s7edu.di.uminho.pt:
+ 1970  scp old.c pg53975@s7edu.di.uminho.pt:
+ 1971  ssh pg53975@s7edu.di.uminho.pt:
+ 1972  ssh pg53975@s7edu.di.uminho.pt
+ 1973  cd ..
+ 1974  scp -r potential/ pg53975@s7edu.di.uminho.pt:
+ 1975  ssh pg53975@s7edu.di.uminho.pt
+ 1976  cd ..
+ 1977  cd code/
+ 1978  make clean
+ 1979  make
+ 1980  make run
+ 1981  gprof gmon.out > relatorios/relatorio8.txt
+ 1982  gprof ./MD.exe > relatorios/relatorio8.txt
+ 1983  make clean
+ 1984  make
+ 1985  sudo perf stat -e L1-dcache-load-misses -M cpi ./MD.exe < inputdata.txt
+ 1986  cd ..
+ 1987  cd Original/
+ 1988  cd code/
+ 1989  make clean
+ 1990  make
+ 1991  sudo perf stat -e L1-dcache-load-misses -M cpi ./MD.exe < inputdata.txt
+ 1992  cd ..
+ 1993  cd testes/computeaccelerations/
+ 1994  rm new old
+ 1995  ls
+ 1996  cd ..
+ 1997  git add code/ testes/
+ 1998  git commit -m "Improved computeaccelerations function."
+ 1999  git push
+ 2000  cd CP/ProjetoCPar/testes/potential/
+ 2001  cd ..
+ 2002  cd potentialaux/
+ 2003  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 2004  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2005  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 2006  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2007  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2008  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2009  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2010  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 2011  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2012  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2013  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2014  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2015  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2016  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2017  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2018  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2019  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2020  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2021  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2022  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2023  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2024  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2025  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 2026  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2027  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2028  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2029  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2030  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2031  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2032  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2033  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2034  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2035  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 2036  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2037  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2038  cd ..
+ 2039  cd potential
+ 2040  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 2041  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2042  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2043  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2044  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2045  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2046  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2047  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2048  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2049  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2050  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2051  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2052  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2053  cd ..
+ 2054  git pull
+ 2055  cd testes/potential
+ 2056  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2057  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2058  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2059  rm new
+ 2060  rm old
+ 2061  cd ..
+ 2062  cd potentialaux/
+ 2063  rm new
+ 2064  rm old
+ 2065  ls
+ 2066  cd ..
+ 2067  cd code/
+ 2068  make clean
+ 2069  make
+ 2070  sudo perf stat -e L1-dcache-load-misses -M cpi ./MD.exe < inputdata.txt
+ 2071  cd ..
+ 2072  cd Original/code/
+ 2073  make clean
+ 2074  make
+ 2075  sudo perf stat -e L1-dcache-load-misses -M cpi ./MD.exe < inputdata.txt
+ 2076  cd ..
+ 2077  cd code/
+ 2078  make clean
+ 2079  make
+ 2080  sudo perf stat -e L1-dcache-load-misses -M cpi ./MD.exe < inputdata.txt
+ 2081  gprof ./MD.exe > relatorios/relatorio9.txt
+ 2082  cd ..
+ 2083  cd testes/potential
+ 2084  ls
+ 2085  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2086  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 2087  gcc -O3 -funroll-loops -mavx new.c -o new -lm
+ 2088  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2089  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2090  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2091  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2092  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2093  gcc -O3 -funroll-loops -mavx old.c -o old -lm
+ 2094  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2095  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2096  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2097  sudo perf stat -e L1-dcache-load-misses -M cpi ./new
+ 2098  sudo perf stat -e L1-dcache-load-misses -M cpi ./old
+ 2099  history | ssh
+ 2100  history > ssh

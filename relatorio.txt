@@ -1,0 +1,58 @@
+versão original
+- Mesma make file
+
+ Performance counter stats for './MD.exe':
+
+      426913309921      inst_retired.any          #     0,51 CPI                    
+      219001917383      cycles                                                      
+
+      63,039065184 seconds time elapsed
+
+      62,995674000 seconds user
+       0,015999000 seconds sys
+
+versão original
+- Mesma make file
+
+ Performance counter stats for './MD.exe':
+
+       50296845996      inst_retired.any          #     0,59 CPI                    
+       29734964144      cycles                                                      
+
+       8,526049623 seconds time elapsed
+
+       8,525440000 seconds user
+       0,000000000 seconds sys
+
+ 219001917383
+- 29734964144
+ 189266953239 #CC
+
+ 426913309921
+- 50296845996
+ 376616463925 #I
+
+
+No search:
+
+ Performance counter stats for './MD.exe':
+
+         790997081      L1-dcache-load-misses                                       
+       54579289076      inst_retired.any          #      0,9 CPI                    
+       50385463034      cycles                                                      
+
+      15,451254491 seconds time elapsed
+
+      15,443533000 seconds user
+       0,002999000 seconds sys
+
+ Performance counter stats for './MD.exe':
+
+        2365426182      L1-dcache-load-misses                                       
+      986779125734      inst_retired.any          #      0,7 CPI                    
+      649168044023      cycles                                                      
+
+     196,971986828 seconds time elapsed
+
+     196,973640000 seconds user
+       0,001000000 seconds sys
