@@ -24,14 +24,15 @@ versão original
        8,525440000 seconds user
        0,000000000 seconds sys
 
- 219001917383
-- 29734964144
- 189266953239 #CC
+ Performance counter stats for './MD.exe':
 
- 426913309921
-- 50296845996
- 376616463925 #I
+       47953925562      inst_retired.any          #     0,59 CPI                    
+       28324087750      cycles                                                      
 
+       8,114117794 seconds time elapsed
+
+       8,103906000 seconds user
+       0,007999000 seconds sys
 
 No search:
 
