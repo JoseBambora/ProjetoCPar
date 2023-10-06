@@ -1,0 +1,51 @@
+Sem otimizações do gcc:
+4663440.000000
+
+ Performance counter stats for './old':
+
+          94254120      inst_retired.any          #     0,56 CPI                    
+          53145439      cycles                                                      
+
+       0,015756886 seconds time elapsed
+
+       0,015685000 seconds user
+       0,000000000 seconds sys
+
+4663440.000000
+
+ Performance counter stats for './new':
+
+         122256382      inst_retired.any          #     0,51 CPI                    
+          62759068      cycles                                                      
+
+       0,024501145 seconds time elapsed
+
+       0,020619000 seconds user
+       0,003436000 seconds sys
+
+==========================================================================
+
+Com otimizações do gcc:
+4663440.000000
+
+ Performance counter stats for './old':
+
+           7628164      inst_retired.any          #     2,93 CPI                    
+          22358059      cycles                                                      
+
+       0,006739417 seconds time elapsed
+
+       0,006762000 seconds user
+       0,000000000 seconds sys
+
+4663440.000000
+
+ Performance counter stats for './new':
+
+           5538471      inst_retired.any          #     0,71 CPI                    
+           3941021      cycles                                                      
+
+       0,001481566 seconds time elapsed
+
+       0,001539000 seconds user
+       0,000000000 seconds sys
