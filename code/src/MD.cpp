@@ -486,28 +486,27 @@ double Potential() {
 // José
 void computeAccelerations() {
     int i, j;
-    double rij0, rij1, rij2, rSqd, f;
-    for (i = 0; i < 3*N; i++)  // set all accelerations to zero
+    double rij0, rij1, rij2, rSqd, rSqd3, f;
+    for (i = 0; i < 3*N; i++)
         a[i] = 0;
-    for (i = 0; i < 3*(N-1); i+=3) {   // loop over all distinct pairs i,j
+    for (i = 0; i < 3*(N-1); i+=3) {
         for (j = i+3; j < 3*N; j+=3) {
-            //  component-by-componenent position of i relative to j
-            rij0 = r[i] - r[j];
-            rij1 = r[i+1] - r[j+1];
-            rij2 = r[i+2] - r[j+2];
-            //  sum of squares of the components
-            rSqd = rij0 * rij0 + rij1 * rij1 + rij2 * rij2;
-            
-            //  From derivative of Lennard-Jones with sigma and epsilon set equal to 1 in natural units!
-            f = 24 * (2 * pow(rSqd, -7) - pow(rSqd, -4));
-            //  from F = ma, where m = 1 in natural units!
-            a[i] += rij0 * f;
-            a[i+1] += rij1 * f;
-            a[i+2] += rij2 * f;
+            rij0  = r[i] - r[j];
+            rij1  = r[i+1] - r[j+1];
+            rij2  = r[i+2] - r[j+2];
+            rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
+            rSqd3 = rSqd * rSqd * rSqd;
+            f     = 24 * (2 * rSqd3 * rSqd * rSqd3 - rSqd3 * rSqd);
+            rij0  = rij0 * f;
+            rij1  = rij1 * f;
+            rij2  = rij2 * f;
+            a[j]   -= rij0;
+            a[j+1] -= rij1;
+            a[j+2] -= rij2;
 
-            a[j] -= rij0 * f;
-            a[j+1] -= rij1 * f;
-            a[j+2] -= rij2 * f;
+            a[i]   += rij0;
+            a[i+1] += rij1;
+            a[i+2] += rij2;
         }
     }
 }
