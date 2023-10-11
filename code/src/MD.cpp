@@ -363,7 +363,7 @@ int main()
 
 // Testada
 void initialize() {
-    int n, p, i, j, k;
+    int n, p, i, j, k, triplo = 3*N;
     double pos;
     
     // Number of atoms in each direction
@@ -378,7 +378,7 @@ void initialize() {
     for (i=0; i<n; i++) {
         for (j=0; j<n; j++) {
             for (k=0; k<n; k++) {
-                if (p<N*3) {
+                if (p<triplo) {
                     
                     r[p] = (i + 0.5)*pos;
                     r[p+1] = (j + 0.5)*pos;
@@ -414,7 +414,8 @@ void initialize() {
 //  Function to calculate the averaged velocity squared
 double MeanSquaredVelocity() { 
     double v2 = 0;
-    for (int i=0; i<N*3; i++) {
+    int triplo = 3*N;
+    for (int i=0; i<triplo; i++) {
         v2 += v[i]*v[i];
     }
     v2 = v2 / N;
@@ -426,9 +427,9 @@ double MeanSquaredVelocity() {
 double Kinetic() { //Write Function here!  
     
     double v2, kin;
-    
+    int triplo = 3*N;
     kin =0.;
-    for (int i=0; i<N*3; i+=3) {
+    for (int i=0; i<triplo; i+=3) {
         v2 = 0.;
         v2 += v[i]*v[i];
         v2 += v[i+1]*v[i+1];
@@ -448,24 +449,15 @@ double PotentialAux(double sub1, double sub2, double sub3)
 
 // Function to calculate the potential energy of the system
 double Potential() {
-    int j, i;
-    double Pot[N] __attribute__((aligned (32)));
-    for (int i = 0; i < N; i++) {
-        Pot[i] = 0.0;
+    int j, i, triplo = 3*N;
+    double Pot = 0.0;
+    for (i=0; i<triplo; i+=3) {
+        for (j=0; j<i; j+=3)
+            Pot += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
+        for (j=i+3; j < triplo; j+=3)
+            Pot += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
     }
-    for (i=0; i<3*N; i+=3) {
-        int aux = 0;
-        for (j=0; j<i; j+=3, aux++)
-            Pot[aux] += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
-        for (j=i+3; j < N*3; j+=3, aux++)
-            Pot[aux] += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
-    }
-    double res = 0;
-    for(int i = 0; i < N; i++)
-    {
-        res += Pot[i];
-    }
-    return 4 * epsilon * res;
+    return 4 * epsilon * Pot;
 }
 
 
@@ -473,12 +465,12 @@ double Potential() {
 //   the forces on each atom.  Then uses a = F/m to calculate the
 //   accelleration of each atom.
 void computeAccelerations() {
-    int i, j;
+    int i, j, triplo = 3*N;
     double rij0, rij1, rij2, rSqd, rSqd3, f;
-    for (i = 0; i < 3*N; i++)
+    for (i = 0; i < triplo; i++)
         a[i] = 0;
-    for (i = 0; i < 3*(N-1); i+=3) {
-        for (j = i+3; j < 3*N; j+=3) {
+    for (i = 0; i < triplo-3; i+=3) {
+        for (j = i+3; j < triplo; j+=3) {
             rij0  = r[i] - r[j];
             rij1  = r[i+1] - r[j+1];
             rij2  = r[i+2] - r[j+2];
@@ -501,7 +493,7 @@ void computeAccelerations() {
 
 // returns sum of dv/dt*m/A (aka Pressure) from elastic collisions with walls
 double VelocityVerlet(double dt, int iter, FILE *fp) {
-    int i, j, k;
+    int i, j, k, triplo = 3*N;
     
     double psum = 0.;
     
@@ -510,7 +502,7 @@ double VelocityVerlet(double dt, int iter, FILE *fp) {
     //computeAccelerations();
     //  Update positions and velocity with current velocity and acceleration
     //printf("  Updated Positions!\n");
-    for (i=0; i<N*3; i++) {
+    for (i=0; i<triplo; i++) {
 
         r[i]   += v[i]  *dt + 0.5*a[i]  *dt*dt;
         v[i]   += 0.5*a[i]  *dt;
@@ -519,12 +511,12 @@ double VelocityVerlet(double dt, int iter, FILE *fp) {
     //  Update accellerations from updated positions
     computeAccelerations();
     //  Update velocity with updated acceleration
-    for (i=0; i<N*3; i++) {
+    for (i=0; i<triplo; i++) {
         v[i]   += 0.5*a[i]*dt;
     }
     
     // Elastic walls
-    for (i=0; i<N*3; i++) {
+    for (i=0; i<triplo; i++) {
         if (r[i]<0.) {
             v[i] *=-1.; //- elastic walls
             psum += 2*m*fabs(v[i])/dt;  // contribution to pressure from "left" walls
@@ -553,9 +545,9 @@ double VelocityVerlet(double dt, int iter, FILE *fp) {
 // Testada
 void initializeVelocities() {
     
-    int i;
+    int i, triplo = 3*N;
     
-    for (i=0; i<N*3; i+=3) {
+    for (i=0; i<triplo; i+=3) {
         v[i] = gaussdist();
         v[i+1] = gaussdist();
         v[i+2] = gaussdist();
@@ -565,22 +557,22 @@ void initializeVelocities() {
     // Compute center-of-mas velocity according to the formula above
     double vCM[3] = {0, 0, 0};
 
-    for (i=0; i<N*3; i+=3) {
-        vCM[0] += m*v[i];
-        vCM[1] += m*v[i+1];
-        vCM[2] += m*v[i+2];
+    for (i=0; i<triplo; i+=3) {
+        vCM[0] += v[i];
+        vCM[1] += v[i+1];
+        vCM[2] += v[i+2];
     }
     
     
-    vCM[0] /= N*m;
-    vCM[1] /= N*m;
-    vCM[2] /= N*m;
+    vCM[0] /= N;
+    vCM[1] /= N;
+    vCM[2] /= N;
     
     //  Subtract out the center-of-mass velocity from the
     //  velocity of each particle... effectively set the
     //  center of mass velocity to zero so that the system does
     //  not drift in space!
-    for (i=0; i<N*3; i+=3) {
+    for (i=0; i<triplo; i+=3) {
         v[i] -= vCM[0];
         v[i+1] -= vCM[1];
         v[i+2] -= vCM[2];
@@ -590,15 +582,13 @@ void initializeVelocities() {
     //  by a factor which is consistent with our initial temperature, Tinit
     double vSqdSum, lambda;
     vSqdSum=0.;
-    for (i=0; i<N*3; i+=3) {
-        vSqdSum += v[i]*v[i];
-        vSqdSum += v[i+1]*v[i+1];
-        vSqdSum += v[i+2]*v[i+2];
+    for (i=0; i<triplo; i+=3) {
+        vSqdSum += v[i]*v[i] + v[i+1]*v[i+1] + v[i+2]*v[i+2];
     }
     
     lambda = sqrt( 3*(N-1)*Tinit/vSqdSum);
     
-    for (i=0; i<N*3; i+=3) {
+    for (i=0; i<triplo; i+=3) {
         v[i]   *= lambda;
         v[i+1] *= lambda;
         v[i+2] *= lambda;
