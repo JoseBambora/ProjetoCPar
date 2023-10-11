@@ -1,6 +1,6 @@
 CC = gcc
 SRC = src/
-CFLAGS = -Ofast -pg -funroll-loops -mavx
+CFLAGS = -O3 -Ofast -pg -funroll-loops -mavx
 
 .DEFAULT_GOAL = MD.exe
 
