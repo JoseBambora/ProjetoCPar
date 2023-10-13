@@ -434,10 +434,10 @@ double Kinetic() { //Write Function here!
         v2 += v[i]*v[i];
         v2 += v[i+1]*v[i+1];
         v2 += v[i+2]*v[i+2];
-        kin += m*v2/2.;
+        kin += v2;
     }
     //printf("  Total Kinetic Energy is %f\n",N*mvs*m/2.);
-    return kin;
+    return m*kin/2.;
 }
 
 double PotentialAux(double sub1, double sub2, double sub3)
@@ -519,11 +519,11 @@ double VelocityVerlet(double dt, int iter, FILE *fp) {
     for (i=0; i<triplo; i++) {
         if (r[i]<0.) {
             v[i] *=-1.; //- elastic walls
-            psum += 2*m*fabs(v[i])/dt;  // contribution to pressure from "left" walls
+            psum += fabs(v[i]);  // contribution to pressure from "left" walls
         }
         if (r[i]>=L) {
             v[i]*=-1.;  //- elastic walls
-            psum += 2*m*fabs(v[i])/dt;  // contribution to pressure from "right" walls
+            psum += fabs(v[i]);  // contribution to pressure from "right" walls
         }
     }
     
@@ -538,7 +538,7 @@ double VelocityVerlet(double dt, int iter, FILE *fp) {
     }*/
     //fprintf(fp,"\n \n");
     // printf("%f\n",psum/(6*L*L));
-    return psum/(6*L*L);
+    return (m*psum)/(3*L*L*dt);
 }
 
 

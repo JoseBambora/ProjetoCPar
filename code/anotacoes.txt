@@ -1,0 +1,74 @@
+         694766307      L1-dcache-load-misses                                       
+       25478020582      inst_retired.any          #      1,6 CPI                    
+       41614385704      cycles                                                      
+
+      13,215826848 seconds time elapsed
+
+      13,207614000 seconds user
+       0,002999000 seconds sys
+
+         673861175      L1-dcache-load-misses                                       
+       25459230383      inst_retired.any          #      1,1 CPI                    
+       29005276188      cycles                                                      
+
+       9,107670185 seconds time elapsed
+
+       9,103129000 seconds user
+       0,001005000 seconds sys
+
+         671988685      L1-dcache-load-misses                                       
+       25458099074      inst_retired.any          #      1,1 CPI                    
+       28334088555      cycles                                                      
+
+       8,764211612 seconds time elapsed
+
+       8,758060000 seconds user
+       0,001000000 seconds sys
+
+         672032456      L1-dcache-load-misses                                       
+       25454301469      inst_retired.any          #      1,1 CPI                    
+       28326841627      cycles                                                      
+
+       8,760252989 seconds time elapsed
+
+       8,750188000 seconds user
+       0,004998000 seconds sys
+
+         672139525      L1-dcache-load-misses                                       
+       25453575989      inst_retired.any          #      1,1 CPI                    
+       27811386695      cycles                                                      
+
+       8,632022661 seconds time elapsed
+
+       8,623779000 seconds user
+       0,002999000 seconds sys
+
+         672184750      L1-dcache-load-misses                                       
+       25454126219      inst_retired.any          #      1,1 CPI                    
+       28328149953      cycles                                                      
+
+       8,751247537 seconds time elapsed
+
+       8,743067000 seconds user
+       0,002999000 seconds sys
+
+
+         672097401      L1-dcache-load-misses                                       
+       25462461388      inst_retired.any          #      1,1 CPI                    
+       27821535699      cycles                                                      
+
+       8,613692982 seconds time elapsed
+
+       8,607775000 seconds user
+       0,001000000 seconds sys
+
+
+
+         670001454      L1-dcache-load-misses:u                                     
+       25418027663      inst_retired.any:u                                          
+       27743119052      cycles:u                                                    
+
+       8,606618180 seconds time elapsed
+
+       8,597339000 seconds user
+       0,001999000 seconds sys
