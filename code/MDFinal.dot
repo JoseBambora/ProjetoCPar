@@ -2,8 +2,8 @@ digraph {
 	graph [fontname=Arial, nodesep=0.125, ranksep=0.25];
 	node [fontcolor=white, fontname=Arial, height=0, shape=box, style=filled, width=0];
 	edge [fontname=Arial];
-	1 [color="#d7d906", fontcolor="#ffffff", fontsize="10.00", label="computeAccelerations()\n74.77%\n(74.77%)\n201×"];
-	2 [color="#d7d906", fontcolor="#ffffff", fontsize="10.00", label="VelocityVerlet(double, int, _IO_FILE*)\n74.77%\n(0.00%)"];
-	2 -> 1 [arrowsize="0.86", color="#d7d906", fontcolor="#d7d906", fontsize="10.00", label="74.77%\n201×", labeldistance="2.99", penwidth="2.99"];
-	3 [color="#0c9492", fontcolor="#ffffff", fontsize="10.00", label="Potential()\n25.23%\n(25.23%)"];
+	1 [color="#cad706", fontcolor="#ffffff", fontsize="10.00", label="computeAccelerations()\n73.38%\n(73.38%)\n201×"];
+	2 [color="#cad706", fontcolor="#ffffff", fontsize="10.00", label="VelocityVerlet(double, int, _IO_FILE*)\n73.38%\n(0.00%)"];
+	2 -> 1 [arrowsize="0.86", color="#cad706", fontcolor="#cad706", fontsize="10.00", label="73.38%\n201×", labeldistance="2.94", penwidth="2.94"];
+	3 [color="#0c968d", fontcolor="#ffffff", fontsize="10.00", label="Potential()\n26.62%\n(26.62%)"];
 }

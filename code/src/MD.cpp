@@ -489,8 +489,10 @@ void computeAccelerations() {
             a[i+2] += rij2;
         }
     }
-    for (i = 0; i < triplo; i++) {
+    for (i = 0; i < triplo; i+=3) {
         a[i] *= 24;
+        a[i+1] *= 24;
+        a[i+2] *= 24;
     }
 }
 
