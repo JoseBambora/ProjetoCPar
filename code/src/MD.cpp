@@ -343,12 +343,12 @@ int main()
     printf("\n  TO ANIMATE YOUR SIMULATION, OPEN THE FILE \n  '%s' WITH VMD AFTER THE SIMULATION COMPLETES\n",tfn);
     printf("\n  TO ANALYZE INSTANTANEOUS DATA ABOUT YOUR MOLECULE, OPEN THE FILE \n  '%s' WITH YOUR FAVORITE TEXT EDITOR OR IMPORT THE DATA INTO EXCEL\n",ofn);
     printf("\n  THE FOLLOWING THERMODYNAMIC AVERAGES WILL BE COMPUTED AND WRITTEN TO THE FILE  \n  '%s':\n",afn);
-    printf("\n  AVERAGE TEMPERATURE (K):                 %15.5f\n",Tavg);
-    printf("\n  AVERAGE PRESSURE  (Pa):                  %15.5f\n",Pavg);
-    printf("\n  PV/nT (J * mol^-1 K^-1):                 %15.5f\n",gc);
-    printf("\n  PERCENT ERROR of pV/nT AND GAS CONSTANT: %15.5f\n",100*fabs(gc-8.3144598)/8.3144598);
-    printf("\n  THE COMPRESSIBILITY (unitless):          %15.5f \n",Z);
-    printf("\n  TOTAL VOLUME (m^3):                      %10.5e \n",Vol*VolFac);
+    printf("\n  AVERAGE TEMPERATURE (K):                 %15.20f\n",Tavg);
+    printf("\n  AVERAGE PRESSURE  (Pa):                  %15.20f\n",Pavg);
+    printf("\n  PV/nT (J * mol^-1 K^-1):                 %15.20f\n",gc);
+    printf("\n  PERCENT ERROR of pV/nT AND GAS CONSTANT: %15.20f\n",100*fabs(gc-8.3144598)/8.3144598);
+    printf("\n  THE COMPRESSIBILITY (unitless):          %15.20f \n",Z);
+    printf("\n  TOTAL VOLUME (m^3):                      %10.20e \n",Vol*VolFac);
     printf("\n  NUMBER OF PARTICLES (unitless):          %i \n", N);
     
     
@@ -476,7 +476,7 @@ void computeAccelerations() {
             rij2  = r[i+2] - r[j+2];
             rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
             rSqd3 = rSqd * rSqd * rSqd;
-            f     = 24 * (2 * rSqd3 * rSqd * rSqd3 - rSqd3 * rSqd);
+            f     = rSqd3 * rSqd * (2 * rSqd3 - 1);
             rij0  = rij0 * f;
             rij1  = rij1 * f;
             rij2  = rij2 * f;
@@ -488,6 +488,9 @@ void computeAccelerations() {
             a[i+1] += rij1;
             a[i+2] += rij2;
         }
+    }
+    for (i = 0; i < triplo; i++) {
+        a[i] *= 24;
     }
 }
 
