@@ -442,8 +442,8 @@ double Kinetic() { //Write Function here!
 
 double PotentialAux(double sub1, double sub2, double sub3)
 {
-    double quot = sigma / sqrt(sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
-    double quot6 = quot * quot * quot * quot * quot * quot;
+    double quot = sigma * sigma / (sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
+    double quot6 = quot * quot * quot;
     return quot6 * quot6 - quot6;
 }
 
