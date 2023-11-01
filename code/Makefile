@@ -1,6 +1,6 @@
-CC = gcc
+CC = g++
 SRC = src/
-CFLAGS = -O3 -Ofast -pg -funroll-loops -mavx
+CFLAGS = -O3 -Ofast -pg -funroll-loops -fopenmp -mavx
 
 .DEFAULT_GOAL = MD.exe
 

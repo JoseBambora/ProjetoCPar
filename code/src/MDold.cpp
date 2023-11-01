@@ -27,7 +27,6 @@
 #include<stdlib.h>
 #include<math.h>
 #include<string.h>
-#include<omp.h>
 
 
 // Number of particles
@@ -87,8 +86,9 @@ int main()
     
     //  variable delcarations
     int i;
-    double dt, Vol, rho;
+    double dt, Vol, Temp, Press, Pavg, Tavg, rho;
     double VolFac, TempFac, PressFac, timefac;
+    double KE, PE, mvs, gc, Z;
     char trash[10000], prefix[1000], tfn[1000], ofn[1000], afn[1000];
     FILE *infp, *tfp, *ofp, *afp;
     
@@ -275,76 +275,67 @@ int main()
     
     //  We want to calculate the average Temperature and Pressure for the simulation
     //  The variables need to be set to zero initially
-    double PavgArray[NumTime+1];
-    double TavgArray[NumTime+1];
+    Pavg = 0;
+    Tavg = 0;
     
     
     int tenp = floor(NumTime/10);
     fprintf(ofp,"  time (s)              T(t) (K)              P(t) (Pa)           Kinetic En. (n.u.)     Potential En. (n.u.) Total En. (n.u.)\n");
     printf("  PERCENTAGE OF CALCULATION COMPLETE:\n  [");
-    # pragma omp parallel
-    # pragma omp single
-    {
-        for (i=0; i<NumTime+1; i++) {
-            //  This just prints updates on progress of the calculation for the users convenience
-            if (i==tenp) printf(" 10 |");
-            else if (i==2*tenp) printf(" 20 |");
-            else if (i==3*tenp) printf(" 30 |");
-            else if (i==4*tenp) printf(" 40 |");
-            else if (i==5*tenp) printf(" 50 |");
-            else if (i==6*tenp) printf(" 60 |");
-            else if (i==7*tenp) printf(" 70 |");
-            else if (i==8*tenp) printf(" 80 |");
-            else if (i==9*tenp) printf(" 90 |");
-            else if (i==10*tenp) printf(" 100 ]\n");
-            fflush(stdout);
-            
-            
-            // This updates the positions and velocities using Newton's Laws
-            // Also computes the Pressure as the sum of momentum changes from wall collisions / timestep
-            // which is a Kinetic Theory of gasses concept of Pressure
-            double Press = VelocityVerlet(dt, i+1, tfp);
-            # pragma omp task firstprivate(r,v, Press)
-            {
-                Press *= PressFac;
-                //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //  Now we would like to calculate somethings about the system:
-                //  Instantaneous mean velocity squared, Temperature, Pressure
-                //  Potential, and Kinetic Energy
-                //  We would also like to use the IGL to try to see if we can extract the gas constant
-                double mvs = MeanSquaredVelocity();
-                double KE = Kinetic();
-                double PE = Potential();
-                
-                // Temperature from Kinetic Theory
-                double Temp = m*mvs/(3*kB) * TempFac;
-                
-                // Instantaneous gas constant and compressibility - not well defined because
-                // pressure may be zero in some instances because there will be zero wall collisions,
-                // pressure may be very high in some instances because there will be a number of collisions
-                // private gc, z
-                double gc = NA*Press*(Vol*VolFac)/(N*Temp);
-                double Z  = Press*(Vol*VolFac)/(N*kBSI*Temp);
-                TavgArray[i] = Temp;
-                PavgArray[i] = Press;
-                fprintf(ofp,"  %8.4e  %20.8f  %20.8f %20.8f  %20.8f  %20.8f \n",i*dt*timefac,Temp,Press,KE, PE, KE+PE);
-            }
-
-        }
-        # pragma omp taskwait
+    for (i=0; i<NumTime+1; i++) {
+        
+        //  This just prints updates on progress of the calculation for the users convenience
+        if (i==tenp) printf(" 10 |");
+        else if (i==2*tenp) printf(" 20 |");
+        else if (i==3*tenp) printf(" 30 |");
+        else if (i==4*tenp) printf(" 40 |");
+        else if (i==5*tenp) printf(" 50 |");
+        else if (i==6*tenp) printf(" 60 |");
+        else if (i==7*tenp) printf(" 70 |");
+        else if (i==8*tenp) printf(" 80 |");
+        else if (i==9*tenp) printf(" 90 |");
+        else if (i==10*tenp) printf(" 100 ]\n");
+        fflush(stdout);
+        
+        
+        // This updates the positions and velocities using Newton's Laws
+        // Also computes the Pressure as the sum of momentum changes from wall collisions / timestep
+        // which is a Kinetic Theory of gasses concept of Pressure
+        Press = VelocityVerlet(dt, i+1, tfp);
+        Press *= PressFac;
+        
+        //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //  Now we would like to calculate somethings about the system:
+        //  Instantaneous mean velocity squared, Temperature, Pressure
+        //  Potential, and Kinetic Energy
+        //  We would also like to use the IGL to try to see if we can extract the gas constant
+        mvs = MeanSquaredVelocity();
+        KE = Kinetic();
+        PE = Potential();
+        
+        // Temperature from Kinetic Theory
+        Temp = m*mvs/(3*kB) * TempFac;
+        
+        // Instantaneous gas constant and compressibility - not well defined because
+        // pressure may be zero in some instances because there will be zero wall collisions,
+        // pressure may be very high in some instances because there will be a number of collisions
+        gc = NA*Press*(Vol*VolFac)/(N*Temp);
+        Z  = Press*(Vol*VolFac)/(N*kBSI*Temp);
+        
+        Tavg += Temp;
+        Pavg += Press;
+        
+        fprintf(ofp,"  %8.4e  %20.8f  %20.8f %20.8f  %20.8f  %20.8f \n",i*dt*timefac,Temp,Press,KE, PE, KE+PE);
+        
+        
     }
-    double Pavg = 0, Tavg = 0;
-    for(i = 0; i < NumTime+1; i++)
-    {
-        Pavg += PavgArray[i];
-        Tavg += TavgArray[i];
-    }
+    
     // Because we have calculated the instantaneous temperature and pressure,
     // we can take the average over the whole simulation here
     Pavg /= NumTime;
     Tavg /= NumTime;
-    double Z = Pavg*(Vol*VolFac)/(N*kBSI*Tavg);
-    double gc = NA*Pavg*(Vol*VolFac)/(N*Tavg);
+    Z = Pavg*(Vol*VolFac)/(N*kBSI*Tavg);
+    gc = NA*Pavg*(Vol*VolFac)/(N*Tavg);
     fprintf(afp,"  Total Time (s)      T (K)               P (Pa)      PV/nT (J/(mol K))         Z           V (m^3)              N\n");
     fprintf(afp," --------------   -----------        ---------------   --------------   ---------------   ------------   -----------\n");
     fprintf(afp,"  %8.4e  %15.5f       %15.5f     %10.5f       %10.5f        %10.5e         %i\n",i*dt*timefac,Tavg,Pavg,gc,Z,Vol*VolFac,N);
@@ -449,89 +440,68 @@ double Kinetic() { //Write Function here!
     return m*kin/2.;
 }
 
-double PotentialMath(double sub1, double sub2, double sub3)
+double PotentialAux(double sub1, double sub2, double sub3)
 {
     double quot = sigma * sigma / (sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
     double quot6 = quot * quot * quot;
     return quot6 * quot6 - quot6;
 }
 
-void PotentialAux(int liminf, int limsup, double *res) {
-    int triplo = 3*N;
-    double Pot = 0;
-    for (int i=0; i<triplo; i+=3) {
-        for (int j=0; j<i; j+=3)
-            Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
-        for (int j=i+3; j < triplo; j+=3)
-            Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
-    }
-    *res = Pot;
-}
-
 // Function to calculate the potential energy of the system
 double Potential() {
-    int j, i, limsup = 3*N;
-    double Pot1, Pot2;
-    # pragma omp task
-    PotentialAux(0,limsup*0.5,&Pot1);
-    PotentialAux(limsup*0.5, limsup,&Pot2);
-    return 4 * epsilon * (Pot1 + Pot2);
+    int j, i, triplo = 3*N;
+    double Pot = 0.0;
+    for (i=0; i<triplo; i+=3) {
+        for (j=0; j<i; j+=3)
+            Pot += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
+        for (j=i+3; j < triplo; j+=3)
+            Pot += PotentialAux(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
+    }
+    return 4 * epsilon * Pot;
 }
 
 
 //   Uses the derivative of the Lennard-Jones potential to calculate
 //   the forces on each atom.  Then uses a = F/m to calculate the
 //   accelleration of each atom.
-
-void computeAccelerationsAux(int liminf, int limsup, double *array) {
-    int triplo = 3*N;
-    // printf("Thread %d começou\n", omp_get_thread_num());
-    for (int i = 0; i < limsup; i+=3) {
-        for (int j = i+3; j < triplo; j+=3) {
-            double rij0  = r[i] - r[j];
-            double rij1  = r[i+1] - r[j+1];
-            double rij2  = r[i+2] - r[j+2];
-            double rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
-            double rSqd3 = rSqd * rSqd * rSqd;
-            double f     = rSqd3 * rSqd * (2 * rSqd3 - 1);
-            rij0  = rij0 * f;
-            rij1  = rij1 * f;
-            rij2  = rij2 * f;
-            array[j]   -= rij0;
-            array[j+1] -= rij1;
-            array[j+2] -= rij2;
-            array[i]   += rij0;
-            array[i+1] += rij1;
-            array[i+2] += rij2;
-        }
-    }
-    // printf("Thread %d acabou\n", omp_get_thread_num());
-}
 void computeAccelerations() {
     int i, j, triplo = 3*N;
     double rij0, rij1, rij2, rSqd, rSqd3, f;
-    double a1[MAXPART*3] __attribute__((aligned (32)));
     for (i = 0; i < triplo; i++)
-    {
         a[i] = 0;
-        a1[i] = 0;
+    for (i = 0; i < triplo-3; i+=3) {
+        for (j = i+3; j < triplo; j+=3) {
+            rij0  = r[i] - r[j];
+            rij1  = r[i+1] - r[j+1];
+            rij2  = r[i+2] - r[j+2];
+            rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
+            rSqd3 = rSqd * rSqd * rSqd;
+            f     = rSqd3 * rSqd * (2 * rSqd3 - 1);
+            rij0  = rij0 * f;
+            rij1  = rij1 * f;
+            rij2  = rij2 * f;
+            a[j]   -= rij0;
+            a[j+1] -= rij1;
+            a[j+2] -= rij2;
+
+            a[i]   += rij0;
+            a[i+1] += rij1;
+            a[i+2] += rij2;
+        }
     }
-    int limsup = triplo - 3;
-    # pragma omp task
-    computeAccelerationsAux(0,limsup*0.5,a1);
-    computeAccelerationsAux(limsup*0.5, limsup,a);
-    # pragma omp taskwait
     for (i = 0; i < triplo; i+=3) {
-        a[i]   = 24 * (a[i]   + a1[i]  );
-        a[i+1] = 24 * (a[i+1] + a1[i+1]);
-        a[i+2] = 24 * (a[i+2] + a1[i+1]);
+        a[i] *= 24;
+        a[i+1] *= 24;
+        a[i+2] *= 24;
     }
 }
 
 // returns sum of dv/dt*m/A (aka Pressure) from elastic collisions with walls
 double VelocityVerlet(double dt, int iter, FILE *fp) {
     int i, j, k, triplo = 3*N;
+    
     double psum = 0.;
+    
     //  Compute accelerations from forces at current position
     // this call was removed (commented) for predagogical reasons
     //computeAccelerations();
