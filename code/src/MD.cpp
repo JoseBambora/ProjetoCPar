@@ -459,7 +459,7 @@ double PotentialMath(double sub1, double sub2, double sub3)
 void PotentialAux(int liminf, int limsup, double *res) {
     int triplo = 3*N;
     double Pot = 0;
-    for (int i=0; i<triplo; i+=3) {
+    for (int i=liminf; i<limsup; i+=3) {
         for (int j=0; j<i; j+=3)
             Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
         for (int j=i+3; j < triplo; j+=3)
@@ -486,7 +486,7 @@ double Potential() {
 void computeAccelerationsAux(int liminf, int limsup, double *array) {
     int triplo = 3*N;
     // printf("Thread %d começou\n", omp_get_thread_num());
-    for (int i = 0; i < limsup; i+=3) {
+    for (int i = liminf; i < limsup; i+=3) {
         for (int j = i+3; j < triplo; j+=3) {
             double rij0  = r[i] - r[j];
             double rij1  = r[i+1] - r[j+1];
@@ -509,8 +509,9 @@ void computeAccelerationsAux(int liminf, int limsup, double *array) {
 }
 void computeAccelerations() {
     int i, j, triplo = 3*N;
-    double rij0, rij1, rij2, rSqd, rSqd3, f;
     double a1[MAXPART*3] __attribute__((aligned (32)));
+    double a2[MAXPART*3] __attribute__((aligned (32)));
+    double a3[MAXPART*3] __attribute__((aligned (32)));
     for (i = 0; i < triplo; i++)
     {
         a[i] = 0;
@@ -518,13 +519,17 @@ void computeAccelerations() {
     }
     int limsup = triplo - 3;
     # pragma omp task
-    computeAccelerationsAux(0,limsup*0.5,a1);
-    computeAccelerationsAux(limsup*0.5, limsup,a);
+    computeAccelerationsAux(0,limsup*0.25,a1);
+    # pragma omp task
+    computeAccelerationsAux(limsup*0.25,limsup*0.5,a1);
+    # pragma omp task
+    computeAccelerationsAux(limsup*0.5,limsup*0.75,a1);
+    computeAccelerationsAux(limsup*0.75, limsup,a);
     # pragma omp taskwait
     for (i = 0; i < triplo; i+=3) {
-        a[i]   = 24 * (a[i]   + a1[i]  );
-        a[i+1] = 24 * (a[i+1] + a1[i+1]);
-        a[i+2] = 24 * (a[i+2] + a1[i+1]);
+        a[i]   = 24 * (a[i]   + a1[i]   + a2[i]   + a3[i]);
+        a[i+1] = 24 * (a[i+1] + a1[i+1] + a2[i+1] + a3[i+1]);
+        a[i+2] = 24 * (a[i+2] + a1[i+1] + a2[i+2] + a3[i+2]);
     }
 }
 
