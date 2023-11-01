@@ -473,7 +473,7 @@ double Potential() {
     int j, i, limsup = 3*N;
     double Pot1, Pot2 = 0;
     # pragma omp task
-    PotentialAux(0,limsup,&Pot1);
+    PotentialAux(0,limsup*0.5,&Pot1);
     PotentialAux(limsup*0.5, limsup,&Pot2);
     # pragma omp taskwait
     return 4 * epsilon * (Pot1 + Pot2);
