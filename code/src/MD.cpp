@@ -471,10 +471,11 @@ void PotentialAux(int liminf, int limsup, double *res) {
 // Function to calculate the potential energy of the system
 double Potential() {
     int j, i, limsup = 3*N;
-    double Pot1, Pot2;
+    double Pot1, Pot2 = 0;
     # pragma omp task
-    PotentialAux(0,limsup*0.5,&Pot1);
+    PotentialAux(0,limsup,&Pot1);
     PotentialAux(limsup*0.5, limsup,&Pot2);
+    # pragma omp taskwait
     return 4 * epsilon * (Pot1 + Pot2);
 }
 
@@ -509,27 +510,30 @@ void computeAccelerationsAux(int liminf, int limsup, double *array) {
 }
 void computeAccelerations() {
     int i, j, triplo = 3*N;
-    double a1[MAXPART*3] __attribute__((aligned (32)));
-    double a2[MAXPART*3] __attribute__((aligned (32)));
-    double a3[MAXPART*3] __attribute__((aligned (32)));
+    // double a1[MAXPART*3] __attribute__((aligned (32)));
+    // double a2[MAXPART*3] __attribute__((aligned (32)));
+    // double a3[MAXPART*3] __attribute__((aligned (32)));
     for (i = 0; i < triplo; i++)
     {
         a[i] = 0;
-        a1[i] = 0;
+        // a1[i] = 0;
+        // a2[i] = 0;
+        // a3[i] = 0;
     }
     int limsup = triplo - 3;
-    # pragma omp task
-    computeAccelerationsAux(0,limsup*0.25,a1);
-    # pragma omp task
-    computeAccelerationsAux(limsup*0.25,limsup*0.5,a1);
-    # pragma omp task
-    computeAccelerationsAux(limsup*0.5,limsup*0.75,a1);
-    computeAccelerationsAux(limsup*0.75, limsup,a);
-    # pragma omp taskwait
+    computeAccelerationsAux(0,limsup,a);
+    // # pragma omp task
+    // computeAccelerationsAux(0,limsup*0.5,a1);
+    // # pragma omp task
+    // computeAccelerationsAux(limsup*0.25,limsup*0.5,a2);
+    // # pragma omp task
+    // computeAccelerationsAux(limsup*0.5,limsup*0.75,a3);
+    // computeAccelerationsAux(limsup*0.5, limsup,a);
+    // # pragma omp taskwait
     for (i = 0; i < triplo; i+=3) {
-        a[i]   = 24 * (a[i]   + a1[i]   + a2[i]   + a3[i]);
-        a[i+1] = 24 * (a[i+1] + a1[i+1] + a2[i+1] + a3[i+1]);
-        a[i+2] = 24 * (a[i+2] + a1[i+1] + a2[i+2] + a3[i+2]);
+        a[i]   = 24 * (a[i]  ); // + a1[i]   + a2[i]   + a3[i]);
+        a[i+1] = 24 * (a[i+1]); // + a1[i+1] + a2[i+1] + a3[i+1]);
+        a[i+2] = 24 * (a[i+2]); // + a1[i+2] + a2[i+2] + a3[i+2]);
     }
 }
 
