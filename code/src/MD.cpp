@@ -473,8 +473,8 @@ double Potential() {
     int j, i, limsup = 3*N;
     double Pot1, Pot2 = 0;
     # pragma omp task
-    PotentialAux(0,limsup*0.5,&Pot1);
-    PotentialAux(limsup*0.5, limsup,&Pot2);
+    PotentialAux(0,limsup>>1,&Pot1);
+    PotentialAux(limsup>>1, limsup,&Pot2);
     # pragma omp taskwait
     return 4 * epsilon * (Pot1 + Pot2);
 }
@@ -486,7 +486,6 @@ double Potential() {
 
 void computeAccelerationsAux(int liminf, int limsup, double *array) {
     int triplo = 3*N;
-    // printf("Thread %d começou\n", omp_get_thread_num());
     for (int i = liminf; i < limsup; i+=3) {
         for (int j = i+3; j < triplo; j+=3) {
             double rij0  = r[i] - r[j];
@@ -506,34 +505,58 @@ void computeAccelerationsAux(int liminf, int limsup, double *array) {
             array[i+2] += rij2;
         }
     }
-    // printf("Thread %d acabou\n", omp_get_thread_num());
 }
+int calculate_growth(int triplo) {
+    int half_threads = omp_get_num_threads() >> 1;
+    return half_threads >= 4 ? triplo>>2 : triplo>>(half_threads>>1);
+}
+
+int calculate_nrtasks() {
+    int half_threads = omp_get_num_threads() >> 1;
+    return half_threads >= 4 ? 4 : half_threads;
+}
+
+int start_task(int nr_tasks, int lim, int growth, double *array, int compare) {
+    if(nr_tasks > compare)
+    {
+        # pragma omp task
+        computeAccelerationsAux(lim,lim+growth,array);
+        lim += growth;
+    }
+    return lim;
+}
+
 void computeAccelerations() {
     int i, j, triplo = 3*N;
-    // double a1[MAXPART*3] __attribute__((aligned (32)));
-    // double a2[MAXPART*3] __attribute__((aligned (32)));
-    // double a3[MAXPART*3] __attribute__((aligned (32)));
+    double a1[MAXPART*3] __attribute__((aligned (32)));
+    double a2[MAXPART*3] __attribute__((aligned (32)));
+    double a3[MAXPART*3] __attribute__((aligned (32)));
     for (i = 0; i < triplo; i++)
     {
         a[i] = 0;
-        // a1[i] = 0;
-        // a2[i] = 0;
-        // a3[i] = 0;
+        a1[i] = 0;
+        a2[i] = 0;
+        a3[i] = 0;
     }
+    // 4 threads  -> /2
+    // 6 threads  -> /3
+    // 8 threads  -> /4
+    // 16 threads -> /4
+    // ... -> /4
+    int lim = 0;
+    int growth = calculate_growth(triplo);
+    int nr_tasks = calculate_nrtasks();
+    // 1 .. 4
+    lim = start_task(nr_tasks,lim,growth,a,2);
+    lim = start_task(nr_tasks,lim,growth,a1,3);
+    lim = start_task(nr_tasks,lim,growth,a2,4);
     int limsup = triplo - 3;
-    computeAccelerationsAux(0,limsup,a);
-    // # pragma omp task
-    // computeAccelerationsAux(0,limsup*0.5,a1);
-    // # pragma omp task
-    // computeAccelerationsAux(limsup*0.25,limsup*0.5,a2);
-    // # pragma omp task
-    // computeAccelerationsAux(limsup*0.5,limsup*0.75,a3);
-    // computeAccelerationsAux(limsup*0.5, limsup,a);
-    // # pragma omp taskwait
+    computeAccelerationsAux(lim,limsup,a3);
+    # pragma omp taskwait
     for (i = 0; i < triplo; i+=3) {
-        a[i]   = 24 * (a[i]  ); // + a1[i]   + a2[i]   + a3[i]);
-        a[i+1] = 24 * (a[i+1]); // + a1[i+1] + a2[i+1] + a3[i+1]);
-        a[i+2] = 24 * (a[i+2]); // + a1[i+2] + a2[i+2] + a3[i+2]);
+        a[i]   = 24 * (a[i]   + a1[i]   + a2[i]   + a3[i]  );         
+        a[i+1] = 24 * (a[i+1] + a1[i+1] + a2[i+1] + a3[i+1]);
+        a[i+2] = 24 * (a[i+2] + a1[i+2] + a2[i+2] + a3[i+2]);
     }
 }
 
