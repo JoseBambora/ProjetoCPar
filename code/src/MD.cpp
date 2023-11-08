@@ -283,7 +283,7 @@ int main()
     fprintf(ofp,"  time (s)              T(t) (K)              P(t) (Pa)           Kinetic En. (n.u.)     Potential En. (n.u.) Total En. (n.u.)\n");
     printf("  PERCENTAGE OF CALCULATION COMPLETE:\n  [");
     # pragma omp parallel
-    # pragma omp single
+    # pragma omp single nowait
     {
         for (i=0; i<NumTime+1; i++) {
             //  This just prints updates on progress of the calculation for the users convenience
@@ -468,6 +468,29 @@ void PotentialAux(int liminf, int limsup, double *res) {
     *res = Pot;
 }
 
+/*
+double Potential() {
+    int limsup = 3*N;
+    int num_threads = omp_get_num_threads();
+    double potAux[num_threads] __attribute__((aligned (32)));
+    #pragma omp taskloop simd
+    for (int i=0; i< num_threads; i++)
+        potAux[i] = 0; 
+    #pragma omp taskloop simd
+    for (int i=0; i<limsup; i+=3) {
+        double Pot = 0;
+        for (int j=0; j<i; j+=3)
+            Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
+        for (int j=i+3; j < limsup; j+=3)
+            Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
+        potAux[omp_get_thread_num()] += Pot;
+    }
+    double Pot = 0;
+    for (int i = 0; i < num_threads; i++)
+        Pot += potAux[i];
+    return 4 * epsilon * Pot;
+}
+*/
 // Function to calculate the potential energy of the system
 double Potential() {
     int j, i, limsup = 3*N;
@@ -479,11 +502,9 @@ double Potential() {
     return 4 * epsilon * (Pot1 + Pot2);
 }
 
-
 //   Uses the derivative of the Lennard-Jones potential to calculate
 //   the forces on each atom.  Then uses a = F/m to calculate the
 //   accelleration of each atom.
-
 void computeAccelerationsAux(int liminf, int limsup, double *array) {
     int triplo = 3*N;
     for (int i = liminf; i < limsup; i+=3) {
@@ -506,25 +527,8 @@ void computeAccelerationsAux(int liminf, int limsup, double *array) {
         }
     }
 }
-int calculate_growth(int triplo) {
-    int half_threads = omp_get_num_threads() >> 1;
-    return half_threads >= 4 ? triplo>>2 : triplo>>(half_threads>>1);
-}
+/*
 
-int calculate_nrtasks() {
-    int half_threads = omp_get_num_threads() >> 1;
-    return half_threads >= 4 ? 4 : half_threads;
-}
-
-int start_task(int nr_tasks, int lim, int growth, double *array, int compare) {
-    if(nr_tasks > compare)
-    {
-        # pragma omp task
-        computeAccelerationsAux(lim,lim+growth,array);
-        lim += growth;
-    }
-    return lim;
-}
 
 void computeAccelerations() {
     int i, j, triplo = 3*N;
@@ -558,6 +562,39 @@ void computeAccelerations() {
         a[i+1] = 24 * (a[i+1] + a1[i+1] + a2[i+1] + a3[i+1]);
         a[i+2] = 24 * (a[i+2] + a1[i+2] + a2[i+2] + a3[i+2]);
     }
+}
+*/
+void computeAccelerations() {
+    int triplo = 3*N;
+    int number_threads = omp_get_num_threads();
+    double *aaux[number_threads];
+    for(int i = 0 ; i < number_threads; i++)
+        aaux[i] = (double*)calloc(MAXPART*3, sizeof(double));
+    int intervalo = triplo / number_threads;
+    # pragma omp taskloop simd
+    for(int i = 0 ; i < number_threads; i++) {
+        int liminf = i*intervalo;
+        int limsup = i*intervalo+intervalo;
+        limsup = limsup == triplo ? limsup - 3 : limsup;
+        computeAccelerationsAux(liminf,limsup,aaux[i]);
+    }
+    # pragma omp taskloop simd
+    for (int i = 0; i < triplo; i+=3) {
+        double ai0 = 0;
+        double ai1 = 0;
+        double ai2 = 0;
+        for(int j = 0 ; j < number_threads; j++) {
+            ai0 += aaux[j][i];
+            ai1 += aaux[j][i+1];
+            ai2 += aaux[j][i+2];
+        }
+        a[i]   = 24 * ai0;
+        a[i+1] = 24 * ai1;
+        a[i+2] = 24 * ai2;
+    }
+    # pragma omp taskloop simd
+    for(int i = 0 ; i < number_threads; i++)
+        free(aaux[i]);
 }
 
 // returns sum of dv/dt*m/A (aka Pressure) from elastic collisions with walls
