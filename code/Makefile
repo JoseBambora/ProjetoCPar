@@ -1,14 +1,21 @@
-CC = g++
+CC1 = gcc
+CC2 = g++
 SRC = src/
-CFLAGS = -O3 -Ofast -pg -funroll-loops -fopenmp -mavx
+CFLAGS = -O3 -Ofast -funroll-loops -mavx
+.DEFAULT_GOAL = all
+all: MDseq.exe MDpar.exe
 
-.DEFAULT_GOAL = MD.exe
-
-MD.exe: $(SRC)/MD.cpp
-	$(CC) $(CFLAGS) $(SRC)MD.cpp -lm -o MD.exe
+MDseq.exe: $(SRC)/MDseq.cpp
+	module load gcc/11.2.0;
+	$(CC1) $(CFLAGS) $(SRC)MDseq.cpp -lm -o MDseq.exe
+MDpar.exe: $(SRC)/MDpar.cpp
+	module load gcc/11.2.0;
+	$(CC2) $(CFLAGS) $(SRC)MDpar.cpp -lm -fopenmp -o MDpar.exe
 
 clean:
-	rm ./MD.exe
+	rm ./MD*.exe
 
-run:
-	./MD.exe < inputdata.txt
+runseq:
+	./MDseq.exe < inputdata.txt
+runpar:
+	./MDpar.exe < inputdata.txt

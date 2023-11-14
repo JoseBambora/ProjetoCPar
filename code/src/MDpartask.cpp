@@ -211,7 +211,8 @@ int main()
     
     scanf("%lf",&rho);
     
-    N = 10*216;
+    // N = 10*216;
+    N = 5000;
     Vol = N/(rho*NA);
     
     Vol /= VolFac;
@@ -267,7 +268,6 @@ int main()
     //  Based on their positions, calculate the ininial intermolecular forces
     //  The accellerations of each particle will be defined from the forces and their
     //  mass, and this will allow us to update their positions via Newton's law
-    computeAccelerations();
     
     
     // Print number of particles to the trajectory file
@@ -285,6 +285,7 @@ int main()
     # pragma omp parallel
     # pragma omp single nowait
     {
+        computeAccelerations();
         for (i=0; i<NumTime+1; i++) {
             //  This just prints updates on progress of the calculation for the users convenience
             if (i==tenp) printf(" 10 |");
@@ -574,7 +575,7 @@ void computeAccelerations() {
     # pragma omp taskloop simd
     for(int i = 0 ; i < number_threads; i++) {
         int liminf = i*intervalo;
-        int limsup = i*intervalo+intervalo;
+        int limsup = liminf+intervalo;
         limsup = limsup == triplo ? limsup - 3 : limsup;
         computeAccelerationsAux(liminf,limsup,aaux[i]);
     }
