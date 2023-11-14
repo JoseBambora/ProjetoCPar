@@ -571,12 +571,12 @@ void computeAccelerations() {
     double *aaux[number_threads];
     for(int i = 0 ; i < number_threads; i++)
         aaux[i] = (double*)calloc(MAXPART*3, sizeof(double));
-    int intervalo = triplo / number_threads;
+    int intervalo = (int) ceil((float) triplo / number_threads);
     # pragma omp taskloop simd
     for(int i = 0 ; i < number_threads; i++) {
         int liminf = i*intervalo;
         int limsup = liminf+intervalo;
-        limsup = limsup == triplo ? limsup - 3 : limsup;
+        limsup = limsup > triplo ? triplo - 3 : limsup;
         computeAccelerationsAux(liminf,limsup,aaux[i]);
     }
     # pragma omp taskloop simd
