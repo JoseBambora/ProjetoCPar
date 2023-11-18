@@ -305,6 +305,7 @@ int main()
             // Also computes the Pressure as the sum of momentum changes from wall collisions / timestep
             // which is a Kinetic Theory of gasses concept of Pressure
             double Press = VelocityVerlet(dt, i+1, tfp);
+            // Criação da tarefa que vai executar o resto do ciclo
             # pragma omp task firstprivate(r,v, Press)
             {
                 Press *= PressFac;
@@ -469,35 +470,14 @@ void PotentialAux(int liminf, int limsup, double *res) {
     *res = Pot;
 }
 
-/*
-double Potential() {
-    int limsup = 3*N;
-    int num_threads = omp_get_num_threads();
-    double potAux[num_threads] __attribute__((aligned (32)));
-    #pragma omp taskloop simd
-    for (int i=0; i< num_threads; i++)
-        potAux[i] = 0; 
-    #pragma omp taskloop simd
-    for (int i=0; i<limsup; i+=3) {
-        double Pot = 0;
-        for (int j=0; j<i; j+=3)
-            Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
-        for (int j=i+3; j < limsup; j+=3)
-            Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
-        potAux[omp_get_thread_num()] += Pot;
-    }
-    double Pot = 0;
-    for (int i = 0; i < num_threads; i++)
-        Pot += potAux[i];
-    return 4 * epsilon * Pot;
-}
-*/
 // Function to calculate the potential energy of the system
 double Potential() {
     int j, i, limsup = 3*N;
     double Pot1, Pot2 = 0;
+    // criar uma tarefa que vai fazer a primeira metade das iterações
     # pragma omp task
     PotentialAux(0,limsup>>1,&Pot1);
+    // thread atual vai fazer a segunda metade
     PotentialAux(limsup>>1, limsup,&Pot2);
     # pragma omp taskwait
     return 4 * epsilon * (Pot1 + Pot2);
@@ -528,66 +508,36 @@ void computeAccelerationsAux(int liminf, int limsup, double *array) {
         }
     }
 }
-/*
 
-
-void computeAccelerations() {
-    int i, j, triplo = 3*N;
-    double a1[MAXPART*3] __attribute__((aligned (32)));
-    double a2[MAXPART*3] __attribute__((aligned (32)));
-    double a3[MAXPART*3] __attribute__((aligned (32)));
-    for (i = 0; i < triplo; i++)
-    {
-        a[i] = 0;
-        a1[i] = 0;
-        a2[i] = 0;
-        a3[i] = 0;
-    }
-    // 4 threads  -> /2
-    // 6 threads  -> /3
-    // 8 threads  -> /4
-    // 16 threads -> /4
-    // ... -> /4
-    int lim = 0;
-    int growth = calculate_growth(triplo);
-    int nr_tasks = calculate_nrtasks();
-    // 1 .. 4
-    lim = start_task(nr_tasks,lim,growth,a,2);
-    lim = start_task(nr_tasks,lim,growth,a1,3);
-    lim = start_task(nr_tasks,lim,growth,a2,4);
-    int limsup = triplo - 3;
-    computeAccelerationsAux(lim,limsup,a3);
-    # pragma omp taskwait
-    for (i = 0; i < triplo; i+=3) {
-        a[i]   = 24 * (a[i]   + a1[i]   + a2[i]   + a3[i]  );         
-        a[i+1] = 24 * (a[i+1] + a1[i+1] + a2[i+1] + a3[i+1]);
-        a[i+2] = 24 * (a[i+2] + a1[i+2] + a2[i+2] + a3[i+2]);
-    }
-}
-*/
 void computeAccelerations() {
     int triplo = 3*N;
     int number_threads = omp_get_num_threads();
-    double *aaux[number_threads];
+    // Matriz de replicação
+    double *replication_matrix[number_threads];
+    // Alocar memória e todas as células passam a conter o valor 0
     for(int i = 0 ; i < number_threads; i++)
-        aaux[i] = (double*)calloc(MAXPART*3, sizeof(double));
+        replication_matrix[i] = (double*)calloc(MAXPART*3, sizeof(double));
+    // Variavel que indica o número de iterações a executar por cada task
     int intervalo = (int) ceil((float) triplo / number_threads);
     # pragma omp taskloop simd
     for(int i = 0 ; i < number_threads; i++) {
+        // calculo dos limites
         int liminf = i*intervalo;
         int limsup = liminf+intervalo;
         limsup = limsup > triplo ? triplo - 3 : limsup;
-        computeAccelerationsAux(liminf,limsup,aaux[i]);
+        computeAccelerationsAux(liminf,limsup,replication_matrix[i]);
     }
+    // Guardar os valores no Acceleration array
     # pragma omp taskloop simd
     for (int i = 0; i < triplo; i+=3) {
         double ai0 = 0;
         double ai1 = 0;
         double ai2 = 0;
+        // Soma dos valores das colunas
         for(int j = 0 ; j < number_threads; j++) {
-            ai0 += aaux[j][i];
-            ai1 += aaux[j][i+1];
-            ai2 += aaux[j][i+2];
+            ai0 += replication_matrix[j][i];
+            ai1 += replication_matrix[j][i+1];
+            ai2 += replication_matrix[j][i+2];
         }
         a[i]   = 24 * ai0;
         a[i+1] = 24 * ai1;
@@ -595,7 +545,7 @@ void computeAccelerations() {
     }
     # pragma omp taskloop simd
     for(int i = 0 ; i < number_threads; i++)
-        free(aaux[i]);
+        free(replication_matrix[i]);
 }
 
 // returns sum of dv/dt*m/A (aka Pressure) from elastic collisions with walls
