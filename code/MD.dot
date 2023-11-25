@@ -1,9 +1,0 @@
-digraph {
-	graph [fontname=Arial, nodesep=0.125, ranksep=0.25];
-	node [fontcolor=white, fontname=Arial, height=0, shape=box, style=filled, width=0];
-	edge [fontname=Arial];
-	1 [color="#98cf07", fontcolor="#ffffff", fontsize="10.00", label="VelocityVerlet(double, int, _IO_FILE*)\n68.09%\n(0.20%)"];
-	1 -> 2 [arrowsize="0.82", color="#96cf07", fontcolor="#96cf07", fontsize="10.00", label="67.89%\n201×", labeldistance="2.72", penwidth="2.72"];
-	2 [color="#96cf07", fontcolor="#ffffff", fontsize="10.00", label="computeAccelerations()\n67.89%\n(67.89%)\n201×"];
-	3 [color="#0b9d75", fontcolor="#ffffff", fontsize="10.00", label="Potential()\n31.91%\n(31.91%)"];
-}

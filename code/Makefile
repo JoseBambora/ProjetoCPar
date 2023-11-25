@@ -8,18 +8,18 @@ CFLAGS = -O3 -Ofast -funroll-loops -mavx
 all: MDseq.exe MDpar.exe
 
 MDseq.exe: $(SRC)/MDseq.cpp
-        module load gcc/11.2.0;\
-        $(CC1) $(CFLAGS) $(SRC)MDseq.cpp -lm -o MDseq.exe
+		module load gcc/11.2.0;\
+		$(CC1) $(CFLAGS) $(SRC)MDseq.cpp -lm -o MDseq.exe
 
 MDpar.exe: $(SRC)/MDpar.cpp
-        module load gcc/11.2.0;\
-        $(CC2) $(CFLAGS) $(SRC)MDpar.cpp -lm -fopenmp -o MDpar.exe
+		module load gcc/11.2.0;\
+		$(CC2) $(CFLAGS) $(SRC)MDpar.cpp -lm -fopenmp -o MDpar.exe
 
 clean:
-          rm ./MD*.exe
+		rm ./MD*.exe
 runseq: MDseq.exe
-        ./MDseq.exe < inputdata.txt
+		./MDseq.exe < inputdata.txt
 
 runpar: MDpar.exe
-        export OMP_NUM_THREADS=2;\
-        ./MDpar.exe < inputdata.txt
+		export OMP_NUM_THREADS=2;\
+		./MDpar.exe < inputdata.txt
