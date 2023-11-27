@@ -6,11 +6,11 @@ def plot_points(points_ganho_task,points_ganho_thread, points_esperado):
     x_values_e, y_values_e = zip(*points_esperado)  
     plt.plot(x_values_e, y_values_e, linestyle='--', marker='o', color='green', label="Theorical")
     plt.plot(x_values_gtask, y_values_gtask, linestyle='--', marker='o', color='red',   label="Real tasks")
-    plt.plot(x_values_gthread, y_values_gthread, linestyle='--', marker='o', color='yellow',   label="Real threads")
+    plt.plot(x_values_gthread, y_values_gthread, linestyle='--', marker='o', color='blue',   label="Real threads")
 
     plt.xticks(x_values_gtask)
     plt.xlabel('Nr of Threads')
-    plt.ylabel('Gain')
+    plt.ylabel('Speedup')
     plt.title('Performance comparison')
     plt.legend()
     plt.show()
@@ -37,7 +37,18 @@ x36 =  3.554
 x38 =  3.300
 x40 =  3.227
 
-x_task_lista = [x1,x2,x4,x6,x8,x10,x12,x14,x16,x18,x20,x22,x24,x26,x28,x30,x32,x34,x36,x38,x40]
+
+x5  = 7.027
+x10 = 3.884
+x15 = 2.821
+x20 = 2.180
+x25 = 2.748
+x30 = 2.713
+x35 = 2.563
+x40 = 2.463
+
+# x_task_lista = [x1,x2,x4,x6,x8,x10,x12,x14,x16,x18,x20,x22,x24,x26,x28,x30,x32,x34,x36,x38,x40]
+x_task_lista = [x1,x5,x10,x15,x20,x25,x30,x35,x40]
 ganho_tasks = [x1 / elem for elem in x_task_lista]
 
 x2  = 49.379
@@ -50,11 +61,12 @@ x40 = 33.324
 x_thread_lista = [x1,x2,x10,x20,x30,x40]
 ganho_thread = [x1 / elem for elem in x_thread_lista]
 
-ganho_esperado = [1] + [value for value in range(2,42,2)]
+ganho_esperado = [1] + [value for value in range(2,22,2)] +[20 for i in range(20,42,2)]
 
-x = [1] + [i for i in range(2,42,2)]
+x  = [1]   + [i for i in range(2 ,42,2 )]
+x1 = [1]   + [i for i in range(5 ,42,5 )]
 x2 = [1,2] + [i for i in range(10,50,10)]
-points_ganho_tasks = list(zip(x,ganho_tasks))
+points_ganho_tasks = list(zip(x1,ganho_tasks))
 points_ganho_thread = list(zip(x2,ganho_thread))
 points_esperado = list(zip(x,ganho_esperado))
 plot_points(points_ganho_tasks,points_ganho_thread,points_esperado)
