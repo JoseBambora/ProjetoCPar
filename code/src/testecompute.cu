@@ -58,7 +58,6 @@ __device__ double ourAtomicMinus(double* address, double val)
 
 __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int triplo){
     int i = blockIdx.x * blockDim.x * 3 + threadIdx.x;
-    int aux = blockIdx.x * blockDim.x * 3;
     if (i < triplo) {
         double ai0 = 0, ai1 = 0, ai2 = 0;
         for (int j = i+3; j < triplo; j+=3) {
@@ -71,16 +70,16 @@ __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int t
             rij0  = rij0 * f;
             rij1  = rij1 * f;
             rij2  = rij2 * f;
-            ourAtomicMinus(&acuda[aux+j],rij0);
-            ourAtomicMinus(&acuda[aux+j+1],rij1);
-            ourAtomicMinus(&acuda[aux+j+2],rij2);
+            ourAtomicMinus(&acuda[j],rij0);
+            ourAtomicMinus(&acuda[j+1],rij1);
+            ourAtomicMinus(&acuda[j+2],rij2);
             ai0 += rij0;
             ai1 += rij1;
             ai2 += rij2;
         }
-	    ourAtomicAdd(&acuda[aux+i],ai0);
-        ourAtomicAdd(&acuda[aux+i],ai1);
-        ourAtomicAdd(&acuda[aux+i],ai2);
+	    ourAtomicAdd(&acuda[i],ai0);
+        ourAtomicAdd(&acuda[i+1],ai1);
+        ourAtomicAdd(&acuda[i+2],ai2);
     }
 }
 
