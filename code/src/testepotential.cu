@@ -46,30 +46,37 @@ __device__ double PotentialMath(double sub1, double sub2, double sub3,double sig
 
 __global__ void PotentialDivision(double *rcuda, double *result, int triplo,double sigma) {
     double Pot = 0;
-    int i = blockIdx.x;
-    for (int j=0; j < i; j+=3)
-        Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
-    for (int j=i+3; j < triplo; j+=3)
-        Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
-    ourAtomicAdd(result, Pot);
+    // i = 0, j = 0
+    // i = 0, j = 1
+
+    int i = blockIdx.x * blockDim.x + threadIdx.x * 3;
+    if( i < triplo)
+    {
+     	for (int j=0; j < i; j+=3)
+                Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
+        for (int j=i+3; j < triplo; j+=3)
+                Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
+        ourAtomicAdd(result, Pot);
+    }
 }
 
-// Function to calculate the potential energy of the system
+
 double Potential() {
-    int num_blocks = 3*N;
-    int num_threads_per_block = 1;
+    int num_blocks = 256;
+    int num_threads_per_block = 256;
     double *rcuda, *potcuda, Pot;
     int bytes = N * 3 * sizeof(double);
     cudaMalloc ((void**) &rcuda, bytes);
     cudaMalloc ((void**) &potcuda, sizeof(double));
     cudaMemcpy (rcuda, r, bytes, cudaMemcpyHostToDevice);
     cudaMemset (potcuda, 0, sizeof(double));
-    PotentialDivision<<<num_threads_per_block,num_blocks>>>(rcuda,potcuda,3*N,sigma);
+    PotentialDivision<<<num_blocks,num_threads_per_block>>>(rcuda,potcuda,3*N,sigma);
     cudaMemcpy(&Pot, potcuda, sizeof(double), cudaMemcpyDeviceToHost);
     cudaFree(rcuda);
     cudaFree(potcuda);
     return 4 * epsilon * Pot;
 }
+
 
 
 
