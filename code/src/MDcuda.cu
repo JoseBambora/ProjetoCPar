@@ -102,6 +102,24 @@ __device__ double ourAtomicAdd(double* address, double val)
     return __longlong_as_double(old);
 }
 
+__device__ double ourAtomicMinus(double* address, double val)
+{
+    unsigned long long int* address_as_ull =
+                              (unsigned long long int*)address;
+    unsigned long long int old = *address_as_ull, assumed;
+
+    do {
+        assumed = old;
+        old = atomicCAS(address_as_ull, assumed,
+                        __double_as_longlong(val -
+                               __longlong_as_double(assumed)));
+
+    // Note: uses integer comparison to avoid hang in case of NaN (since NaN != NaN)
+    } while (assumed != old);
+
+    return __longlong_as_double(old);
+}
+
 int main()
 {
     
@@ -455,6 +473,7 @@ double Kinetic() { //Write Function here!
     return m*kin/2.;
 }
 
+
 __device__ double PotentialMath(double sub1, double sub2, double sub3,double sigma)
 {
     double quot = sigma * sigma / (sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
@@ -463,114 +482,88 @@ __device__ double PotentialMath(double sub1, double sub2, double sub3,double sig
 }
 
 __global__ void PotentialDivision(double *rcuda, double *result, int triplo,double sigma) {
-    // 0 -> 0 * 50 * 3 = 0   + 0 -> 0
-    // 0 -> 0 * 50 * 3 = 0   + 1 -> 1
-    // 1 -> 1 * 50 * 3 = 150 + 0 -> 150
-    // 2 -> 2 * 50 * 3 = 300
     double Pot = 0;
-    int i = blockIdx.x * blockDim.x * 3 + threadIdx.x;
-    if(threadIdx.x > 49) // para N == 5000
+    // i = 0, j = 0
+    // i = 0, j = 1
+
+    int i = blockIdx.x * blockDim.x + threadIdx.x * 3;
+    if( i < triplo)
     {
-        for (int j=0; j < i; j+=3)
-            Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
+     	for (int j=0; j < i; j+=3)
+                Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
         for (int j=i+3; j < triplo; j+=3)
-            Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
+                Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
         ourAtomicAdd(result, Pot);
     }
 }
 
-// Function to calculate the potential energy of the system
+
 double Potential() {
-    int num_blocks = 300;
-    int num_threads_per_block = 64;
-    // criar uma tarefa que vai fazer a primeira metade das iterações
+    int num_blocks = 256;
+    int num_threads_per_block = 256;
     double *rcuda, *potcuda, Pot;
     int bytes = N * 3 * sizeof(double);
     cudaMalloc ((void**) &rcuda, bytes);
     cudaMalloc ((void**) &potcuda, sizeof(double));
     cudaMemcpy (rcuda, r, bytes, cudaMemcpyHostToDevice);
     cudaMemset (potcuda, 0, sizeof(double));
-    PotentialDivision<<<num_threads_per_block,num_blocks>>>(rcuda,potcuda,3*N,sigma);
+    PotentialDivision<<<num_blocks,num_threads_per_block>>>(rcuda,potcuda,3*N,sigma);
     cudaMemcpy(&Pot, potcuda, sizeof(double), cudaMemcpyDeviceToHost);
     cudaFree(rcuda);
     cudaFree(potcuda);
     return 4 * epsilon * Pot;
 }
 
-//   Uses the derivative of the Lennard-Jones potential to calculate
-//   the forces on each atom.  Then uses a = F/m to calculate the
-//   accelleration of each atom.
-// 0 0 -> 0
-// 0 1 -> 0
-// 1 * 50 * 3  + 0 -> 150
-// 249 * 50
-// 250 * 50 *
-__global__ void computeAccelerationsDivision(double *rcuda, double *replicationcuda, int triplo){
+
+__global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int triplo){
     int i = blockIdx.x * blockDim.x * 3 + threadIdx.x;
-    int aux = blockIdx.x * blockDim.x * 3;
-    double ai0 = 0, ai1 = 0, ai2 = 0;
-    for (int j = i+3; j < triplo; j+=3) {
-        double rij0  = rcuda[i]   - rcuda[j];
-        double rij1  = rcuda[i+1] - rcuda[j+1];
-        double rij2  = rcuda[i+2] - rcuda[j+2];
-        double rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
-        double rSqd3 = rSqd * rSqd * rSqd;
-        double f     = rSqd3 * rSqd * (2 * rSqd3 - 1);
-        rij0  = rij0 * f;
-        rij1  = rij1 * f;
-        rij2  = rij2 * f;
-        replicationcuda[aux+j]   -= rij0;
-        replicationcuda[aux+j+1] -= rij1;
-        replicationcuda[aux+j+2] -= rij2;
-        ai0 += rij0;
-        ai1 += rij1;
-        ai2 += rij2;
-    }
-	replicationcuda[aux+i]   += ai0;
-    replicationcuda[aux+i+1] += ai1;
-    replicationcuda[aux+i+2] += ai2;
-}
-
-
-void divide_work(double *replication_matrix, int number_threads, int triplo, int num_blocks, int num_threads_per_block) {
-    double *rcuda,*replicationcuda;
-    int bytesR   = N * 3 * sizeof(double);
-    int bytesRep = MAXPART*3*number_threads* sizeof(double);
-    cudaMalloc ((void**) &rcuda, bytesR);
-    cudaMalloc ((void**) &replicationcuda, bytesRep);
-    cudaMemcpy (rcuda, r, bytesR, cudaMemcpyHostToDevice);
-    cudaMemcpy (replicationcuda, replication_matrix, bytesRep, cudaMemcpyHostToDevice);
-    computeAccelerationsDivision<<<num_threads_per_block,num_blocks>>>(rcuda,replicationcuda,N*3);
-    cudaMemcpy (replication_matrix, replicationcuda, bytesRep, cudaMemcpyHostToDevice);
-    cudaFree(replicationcuda);
-    cudaFree(rcuda);
-}
-
-double sum_column(double *replication_matrix, int number_threads, int column) {
-    double res = 0;
-    // Soma dos valores das colunas
-    for(int j = 0 ; j < number_threads; j++)
-        res += replication_matrix[j * number_threads + column];
-    return res;
-}
-
-void reduce_matrix_values(double *replication_matrix, int number_threads,int lim) {
-    for (int i = 0; i < lim; i+=3) {
-        a[i]   = 24 * sum_column(replication_matrix,number_threads,i);
-        a[i+1] = 24 * sum_column(replication_matrix,number_threads,i+1);
-        a[i+2] = 24 * sum_column(replication_matrix,number_threads,i+2);
+    if (i < triplo) {
+        double ai0 = 0, ai1 = 0, ai2 = 0;
+        for (int j = i+3; j < triplo; j+=3) {
+            double rij0  = rcuda[i]   - rcuda[j];
+            double rij1  = rcuda[i+1] - rcuda[j+1];
+            double rij2  = rcuda[i+2] - rcuda[j+2];
+            double rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
+            double rSqd3 = rSqd * rSqd * rSqd;
+            double f     = rSqd3 * rSqd * (2 * rSqd3 - 1);
+            rij0  = rij0 * f;
+            rij1  = rij1 * f;
+            rij2  = rij2 * f;
+            ourAtomicMinus(&acuda[j],rij0);
+            ourAtomicMinus(&acuda[j+1],rij1);
+            ourAtomicMinus(&acuda[j+2],rij2);
+            ai0 += rij0;
+            ai1 += rij1;
+            ai2 += rij2;
+        }
+	    ourAtomicAdd(&acuda[i],ai0);
+        ourAtomicAdd(&acuda[i+1],ai1);
+        ourAtomicAdd(&acuda[i+2],ai2);
     }
 }
+
 
 void computeAccelerations() {
-    int triplo = 3*N;
-    int num_blocks = 300;
-    int num_threads_per_block = 64;
-    int number_threads = num_blocks * num_threads_per_block;
-    double *replication_matrix = (double*)calloc(MAXPART*3*number_threads, sizeof(double));
-    divide_work(replication_matrix,number_threads,triplo,num_blocks,num_threads_per_block);   
-    reduce_matrix_values(replication_matrix,number_threads,triplo);
-    free(replication_matrix);
+    int triplo = 3 * N;
+    for (int i = 0; i < triplo; i++)
+        a[i] = 0;
+    int num_blocks = 256;
+    int num_threads_per_block = 256;
+    double *rcuda,*acuda;
+    int bytes   = N * 3 * sizeof(double);
+    cudaMalloc ((void**) &rcuda, bytes);
+    cudaMalloc ((void**) &acuda, bytes);
+    cudaMemcpy (rcuda, r, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy (acuda, a, bytes, cudaMemcpyHostToDevice);
+    computeAccelerationsDivision<<<num_threads_per_block,num_blocks>>>(rcuda,acuda,N*3);
+    cudaMemcpy (a, acuda, bytes, cudaMemcpyDeviceToHost);
+    cudaFree(acuda);
+    cudaFree(rcuda);
+    for (int i = 0; i < triplo; i+=3) {
+        a[i] *= 24;
+        a[i+1] *= 24;
+        a[i+2] *= 24;
+    }
 }
 
 // returns sum of dv/dt*m/A (aka Pressure) from elastic collisions with walls

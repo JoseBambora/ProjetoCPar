@@ -77,7 +77,7 @@ __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int t
             ai1 += rij1;
             ai2 += rij2;
         }
-	    ourAtomicAdd(&acuda[i],ai0);
+        ourAtomicAdd(&acuda[i],ai0);
         ourAtomicAdd(&acuda[i+1],ai1);
         ourAtomicAdd(&acuda[i+2],ai2);
     }
@@ -85,6 +85,9 @@ __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int t
 
 
 void computeAccelerations() {
+    int triplo = 3 * N;
+    for (int i = 0; i < triplo; i++)
+        a[i] = 0;
     int num_blocks = 256;
     int num_threads_per_block = 256;
     double *rcuda,*acuda;
@@ -92,10 +95,16 @@ void computeAccelerations() {
     cudaMalloc ((void**) &rcuda, bytes);
     cudaMalloc ((void**) &acuda, bytes);
     cudaMemcpy (rcuda, r, bytes, cudaMemcpyHostToDevice);
-    computeAccelerationsDivision<<<num_threads_per_block,num_blocks>>>(rcuda,acuda,N*3);
     cudaMemcpy (acuda, a, bytes, cudaMemcpyHostToDevice);
+    computeAccelerationsDivision<<<num_threads_per_block,num_blocks>>>(rcuda,acuda,N*3);
+    cudaMemcpy (a, acuda, bytes, cudaMemcpyDeviceToHost);
     cudaFree(acuda);
     cudaFree(rcuda);
+    for (int i = 0; i < triplo; i+=3) {
+        a[i] *= 24;
+        a[i+1] *= 24;
+        a[i+2] *= 24;
+    }
 }
 
 
@@ -140,9 +149,12 @@ int main() {
     }
     chrono::steady_clock::time_point begin_seq = chrono::steady_clock::now();
     computeAccelerationsSeq();
+    cout << endl << a[0] << ", " << a[1] << ", " << a[2] << endl;
     chrono::steady_clock::time_point begin_cuda = chrono::steady_clock::now();
     computeAccelerations();
+    cout << endl << a[0] << ", " << a[1] << ", " << a[2] << endl;
     chrono::steady_clock::time_point end_cuda = chrono::steady_clock::now();
     cout << endl << "Sequential CPU execution: " << std::chrono::duration_cast<std::chrono::microseconds>(begin_cuda - begin_seq).count()  *0.001 << " miliseconds" << endl << endl;
     cout << endl << "Cuda           execution: " << std::chrono::duration_cast<std::chrono::microseconds>(end_cuda   - begin_cuda).count() *0.001 << " miliseconds" << endl << endl;
+
 }
