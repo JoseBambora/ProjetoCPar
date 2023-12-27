@@ -38,7 +38,7 @@ __device__ double ourAtomicAdd(double* address, double val)
     return __longlong_as_double(old);
 }
 
-__device__ double ourAtomicMinus(double* address, double val)
+__device__ double ourAtomicSub(double* address, double val)
 {
     unsigned long long int* address_as_ull =
                               (unsigned long long int*)address;
@@ -47,8 +47,7 @@ __device__ double ourAtomicMinus(double* address, double val)
     do {
         assumed = old;
         old = atomicCAS(address_as_ull, assumed,
-                        __double_as_longlong(val -
-                               __longlong_as_double(assumed)));
+                        __double_as_longlong(__longlong_as_double(assumed) - val));
 
     // Note: uses integer comparison to avoid hang in case of NaN (since NaN != NaN)
     } while (assumed != old);
@@ -57,8 +56,8 @@ __device__ double ourAtomicMinus(double* address, double val)
 }
 
 __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int triplo){
-    int i = blockIdx.x * blockDim.x * 3 + threadIdx.x;
-    if (i < triplo) {
+    int i = (blockIdx.x * blockDim.x + threadIdx.x) * 3;
+    if (i < triplo - 3) {
         double ai0 = 0, ai1 = 0, ai2 = 0;
         for (int j = i+3; j < triplo; j+=3) {
             double rij0  = rcuda[i]   - rcuda[j];
@@ -70,14 +69,14 @@ __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int t
             rij0  = rij0 * f;
             rij1  = rij1 * f;
             rij2  = rij2 * f;
-            ourAtomicMinus(&acuda[j],rij0);
-            ourAtomicMinus(&acuda[j+1],rij1);
-            ourAtomicMinus(&acuda[j+2],rij2);
+            ourAtomicSub(&acuda[j],rij0);
+            ourAtomicSub(&acuda[j+1],rij1);
+            ourAtomicSub(&acuda[j+2],rij2);
             ai0 += rij0;
             ai1 += rij1;
             ai2 += rij2;
         }
-        ourAtomicAdd(&acuda[i],ai0);
+	    ourAtomicAdd(&acuda[i],ai0);
         ourAtomicAdd(&acuda[i+1],ai1);
         ourAtomicAdd(&acuda[i+2],ai2);
     }

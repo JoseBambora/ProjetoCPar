@@ -28,9 +28,7 @@
 #include<math.h>
 #include<string.h>
 #include<cuda.h>
-cudaEvent_t startm, stopm;
 
-using namespace std;
 
 // Number of particles
 int N;
@@ -84,6 +82,7 @@ double MeanSquaredVelocity();
 //  Compute total kinetic energy from particle mass and velocities
 double Kinetic();
 
+
 __device__ double ourAtomicAdd(double* address, double val)
 {
     unsigned long long int* address_as_ull =
@@ -102,7 +101,7 @@ __device__ double ourAtomicAdd(double* address, double val)
     return __longlong_as_double(old);
 }
 
-__device__ double ourAtomicMinus(double* address, double val)
+__device__ double ourAtomicSub(double* address, double val)
 {
     unsigned long long int* address_as_ull =
                               (unsigned long long int*)address;
@@ -111,8 +110,7 @@ __device__ double ourAtomicMinus(double* address, double val)
     do {
         assumed = old;
         old = atomicCAS(address_as_ull, assumed,
-                        __double_as_longlong(val -
-                               __longlong_as_double(assumed)));
+                        __double_as_longlong(__longlong_as_double(assumed) - val));
 
     // Note: uses integer comparison to avoid hang in case of NaN (since NaN != NaN)
     } while (assumed != old);
@@ -120,13 +118,15 @@ __device__ double ourAtomicMinus(double* address, double val)
     return __longlong_as_double(old);
 }
 
+
 int main()
 {
     
     //  variable delcarations
     int i;
-    double dt, Vol, rho;
+    double dt, Vol, Temp, Press, Pavg, Tavg, rho;
     double VolFac, TempFac, PressFac, timefac;
+    double KE, PE, mvs, gc, Z;
     char prefix[1000], tfn[1000], ofn[1000], afn[1000];
     FILE *tfp, *ofp, *afp;
     
@@ -306,6 +306,7 @@ int main()
     //  Based on their positions, calculate the ininial intermolecular forces
     //  The accellerations of each particle will be defined from the forces and their
     //  mass, and this will allow us to update their positions via Newton's law
+    computeAccelerations();
     
     
     // Print number of particles to the trajectory file
@@ -313,14 +314,15 @@ int main()
     
     //  We want to calculate the average Temperature and Pressure for the simulation
     //  The variables need to be set to zero initially
+    Pavg = 0;
+    Tavg = 0;
     
     
     int tenp = floor(NumTime/10);
     fprintf(ofp,"  time (s)              T(t) (K)              P(t) (Pa)           Kinetic En. (n.u.)     Potential En. (n.u.) Total En. (n.u.)\n");
     printf("  PERCENTAGE OF CALCULATION COMPLETE:\n  [");
-    computeAccelerations();
-    double Pavg = 0, Tavg = 0;
     for (i=0; i<NumTime+1; i++) {
+        
         //  This just prints updates on progress of the calculation for the users convenience
         if (i==tenp) printf(" 10 |");
         else if (i==2*tenp) printf(" 20 |");
@@ -338,37 +340,41 @@ int main()
         // This updates the positions and velocities using Newton's Laws
         // Also computes the Pressure as the sum of momentum changes from wall collisions / timestep
         // which is a Kinetic Theory of gasses concept of Pressure
-        double Press = VelocityVerlet(dt, i+1, tfp);
-        // Criação da tarefa que vai executar o resto do ciclo
+        Press = VelocityVerlet(dt, i+1, tfp);
         Press *= PressFac;
+        
         //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //  Now we would like to calculate somethings about the system:
         //  Instantaneous mean velocity squared, Temperature, Pressure
         //  Potential, and Kinetic Energy
         //  We would also like to use the IGL to try to see if we can extract the gas constant
-        double mvs = MeanSquaredVelocity();
-        double KE = Kinetic();
-        double PE = Potential();
-
+        mvs = MeanSquaredVelocity();
+        KE = Kinetic();
+        PE = Potential();
+        
         // Temperature from Kinetic Theory
-        double Temp = m*mvs/(3*kB) * TempFac;
-
+        Temp = m*mvs/(3*kB) * TempFac;
+        
         // Instantaneous gas constant and compressibility - not well defined because
         // pressure may be zero in some instances because there will be zero wall collisions,
         // pressure may be very high in some instances because there will be a number of collisions
-        // private gc, z
-        double gc = NA*Press*(Vol*VolFac)/(N*Temp);
-        double Z  = Press*(Vol*VolFac)/(N*kBSI*Temp);
+        gc = NA*Press*(Vol*VolFac)/(N*Temp);
+        Z  = Press*(Vol*VolFac)/(N*kBSI*Temp);
+        
         Tavg += Temp;
         Pavg += Press;
+        
         fprintf(ofp,"  %8.4e  %20.8f  %20.8f %20.8f  %20.8f  %20.8f \n",i*dt*timefac,Temp,Press,KE, PE, KE+PE);
+        
+        
     }
+    
     // Because we have calculated the instantaneous temperature and pressure,
     // we can take the average over the whole simulation here
     Pavg /= NumTime;
     Tavg /= NumTime;
-    double Z = Pavg*(Vol*VolFac)/(N*kBSI*Tavg);
-    double gc = NA*Pavg*(Vol*VolFac)/(N*Tavg);
+    Z = Pavg*(Vol*VolFac)/(N*kBSI*Tavg);
+    gc = NA*Pavg*(Vol*VolFac)/(N*Tavg);
     fprintf(afp,"  Total Time (s)      T (K)               P (Pa)      PV/nT (J/(mol K))         Z           V (m^3)              N\n");
     fprintf(afp," --------------   -----------        ---------------   --------------   ---------------   ------------   -----------\n");
     fprintf(afp,"  %8.4e  %15.5f       %15.5f     %10.5f       %10.5f        %10.5e         %i\n",i*dt*timefac,Tavg,Pavg,gc,Z,Vol*VolFac,N);
@@ -473,7 +479,6 @@ double Kinetic() { //Write Function here!
     return m*kin/2.;
 }
 
-
 __device__ double PotentialMath(double sub1, double sub2, double sub3,double sigma)
 {
     double quot = sigma * sigma / (sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
@@ -483,10 +488,7 @@ __device__ double PotentialMath(double sub1, double sub2, double sub3,double sig
 
 __global__ void PotentialDivision(double *rcuda, double *result, int triplo,double sigma) {
     double Pot = 0;
-    // i = 0, j = 0
-    // i = 0, j = 1
-
-    int i = blockIdx.x * blockDim.x + threadIdx.x * 3;
+    int i = (blockIdx.x * blockDim.x + threadIdx.x) * 3;
     if( i < triplo)
     {
      	for (int j=0; j < i; j+=3)
@@ -501,12 +503,12 @@ __global__ void PotentialDivision(double *rcuda, double *result, int triplo,doub
 double Potential() {
     int num_blocks = 256;
     int num_threads_per_block = 256;
-    double *rcuda, *potcuda, Pot;
+    double *rcuda, *potcuda, Pot = 0;
     int bytes = N * 3 * sizeof(double);
     cudaMalloc ((void**) &rcuda, bytes);
     cudaMalloc ((void**) &potcuda, sizeof(double));
     cudaMemcpy (rcuda, r, bytes, cudaMemcpyHostToDevice);
-    cudaMemset (potcuda, 0, sizeof(double));
+    cudaMemcpy (potcuda, &Pot, sizeof(double), cudaMemcpyHostToDevice);
     PotentialDivision<<<num_blocks,num_threads_per_block>>>(rcuda,potcuda,3*N,sigma);
     cudaMemcpy(&Pot, potcuda, sizeof(double), cudaMemcpyDeviceToHost);
     cudaFree(rcuda);
@@ -514,10 +516,9 @@ double Potential() {
     return 4 * epsilon * Pot;
 }
 
-
 __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int triplo){
-    int i = blockIdx.x * blockDim.x * 3 + threadIdx.x;
-    if (i < triplo) {
+    int i = (blockIdx.x * blockDim.x + threadIdx.x) * 3;
+    if (i < triplo - 3) {
         double ai0 = 0, ai1 = 0, ai2 = 0;
         for (int j = i+3; j < triplo; j+=3) {
             double rij0  = rcuda[i]   - rcuda[j];
@@ -529,9 +530,9 @@ __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int t
             rij0  = rij0 * f;
             rij1  = rij1 * f;
             rij2  = rij2 * f;
-            ourAtomicMinus(&acuda[j],rij0);
-            ourAtomicMinus(&acuda[j+1],rij1);
-            ourAtomicMinus(&acuda[j+2],rij2);
+            ourAtomicSub(&acuda[j],rij0);
+            ourAtomicSub(&acuda[j+1],rij1);
+            ourAtomicSub(&acuda[j+2],rij2);
             ai0 += rij0;
             ai1 += rij1;
             ai2 += rij2;
@@ -566,16 +567,53 @@ void computeAccelerations() {
     }
 }
 
+
+void computeAccelerations2() {
+    int i, j, triplo = 3*N;
+    double rij0, rij1, rij2, rSqd, rSqd3, f;
+    for (i = 0; i < triplo; i++)
+        a[i] = 0;
+    for (i = 0; i < triplo-3; i+=3) {
+        for (j = i+3; j < triplo; j+=3) {
+            rij0  = r[i] - r[j];
+            rij1  = r[i+1] - r[j+1];
+            rij2  = r[i+2] - r[j+2];
+            rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
+            rSqd3 = rSqd * rSqd * rSqd;
+            f     = rSqd3 * rSqd * (2 * rSqd3 - 1);
+            rij0  = rij0 * f;
+            rij1  = rij1 * f;
+            rij2  = rij2 * f;
+            a[j]   -= rij0;
+            a[j+1] -= rij1;
+            a[j+2] -= rij2;
+
+            a[i]   += rij0;
+            a[i+1] += rij1;
+            a[i+2] += rij2;
+        }
+    }
+    for (i = 0; i < triplo; i+=3) {
+        a[i] *= 24;
+        a[i+1] *= 24;
+        a[i+2] *= 24;
+    }
+}
+
+
 // returns sum of dv/dt*m/A (aka Pressure) from elastic collisions with walls
 double VelocityVerlet(double dt, int iter, FILE *fp) {
     int i, triplo = 3*N;
+    
     double psum = 0.;
+    
     //  Compute accelerations from forces at current position
     // this call was removed (commented) for predagogical reasons
     //computeAccelerations();
     //  Update positions and velocity with current velocity and acceleration
     //printf("  Updated Positions!\n");
     for (i=0; i<triplo; i++) {
+
         r[i]   += v[i]  *dt + 0.5*a[i]  *dt*dt;
         v[i]   += 0.5*a[i]  *dt;
         //printf("  %i  %6.4e   %6.4e   %6.4e\n",i,r[i][0],r[i][1],r[i][2]);

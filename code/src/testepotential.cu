@@ -37,6 +37,7 @@ __device__ double ourAtomicAdd(double* address, double val)
     return __longlong_as_double(old);
 }
 
+
 __device__ double PotentialMath(double sub1, double sub2, double sub3,double sigma)
 {
     double quot = sigma * sigma / (sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
@@ -46,10 +47,7 @@ __device__ double PotentialMath(double sub1, double sub2, double sub3,double sig
 
 __global__ void PotentialDivision(double *rcuda, double *result, int triplo,double sigma) {
     double Pot = 0;
-    // i = 0, j = 0
-    // i = 0, j = 1
-
-    int i = blockIdx.x * blockDim.x + threadIdx.x * 3;
+    int i = (blockIdx.x * blockDim.x + threadIdx.x) * 3;
     if( i < triplo)
     {
      	for (int j=0; j < i; j+=3)
@@ -64,12 +62,12 @@ __global__ void PotentialDivision(double *rcuda, double *result, int triplo,doub
 double Potential() {
     int num_blocks = 256;
     int num_threads_per_block = 256;
-    double *rcuda, *potcuda, Pot;
+    double *rcuda, *potcuda, Pot = 0;
     int bytes = N * 3 * sizeof(double);
     cudaMalloc ((void**) &rcuda, bytes);
     cudaMalloc ((void**) &potcuda, sizeof(double));
     cudaMemcpy (rcuda, r, bytes, cudaMemcpyHostToDevice);
-    cudaMemset (potcuda, 0, sizeof(double));
+    cudaMemcpy (potcuda, &Pot, sizeof(double), cudaMemcpyHostToDevice);
     PotentialDivision<<<num_blocks,num_threads_per_block>>>(rcuda,potcuda,3*N,sigma);
     cudaMemcpy(&Pot, potcuda, sizeof(double), cudaMemcpyDeviceToHost);
     cudaFree(rcuda);
