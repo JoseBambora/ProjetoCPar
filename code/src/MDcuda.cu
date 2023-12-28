@@ -505,10 +505,10 @@ double Potential() {
     int num_threads_per_block = 256;
     double *rcuda, *potcuda, Pot = 0;
     int bytes = N * 3 * sizeof(double);
-    cudaMalloc ((void**) &rcuda, bytes);
-    cudaMalloc ((void**) &potcuda, sizeof(double));
-    cudaMemcpy (rcuda, r, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy (potcuda, &Pot, sizeof(double), cudaMemcpyHostToDevice);
+    cudaMalloc((void**) &rcuda, bytes);
+    cudaMalloc((void**) &potcuda, sizeof(double));
+    cudaMemcpy(rcuda, r, bytes, cudaMemcpyHostToDevice);
+    cudaMemset(potcuda,0,sizeof(double));
     PotentialDivision<<<num_blocks,num_threads_per_block>>>(rcuda,potcuda,3*N,sigma);
     cudaMemcpy(&Pot, potcuda, sizeof(double), cudaMemcpyDeviceToHost);
     cudaFree(rcuda);
@@ -546,54 +546,19 @@ __global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int t
 
 void computeAccelerations() {
     int triplo = 3 * N;
-    for (int i = 0; i < triplo; i++)
-        a[i] = 0;
     int num_blocks = 256;
     int num_threads_per_block = 256;
     double *rcuda,*acuda;
     int bytes   = N * 3 * sizeof(double);
-    cudaMalloc ((void**) &rcuda, bytes);
-    cudaMalloc ((void**) &acuda, bytes);
-    cudaMemcpy (rcuda, r, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy (acuda, a, bytes, cudaMemcpyHostToDevice);
+    cudaMalloc((void**) &rcuda, bytes);
+    cudaMalloc((void**) &acuda, bytes);
+    cudaMemcpy(rcuda, r, bytes, cudaMemcpyHostToDevice);
+    cudaMemset(acuda, 0, bytes);
     computeAccelerationsDivision<<<num_threads_per_block,num_blocks>>>(rcuda,acuda,N*3);
-    cudaMemcpy (a, acuda, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(a, acuda, bytes, cudaMemcpyDeviceToHost);
     cudaFree(acuda);
     cudaFree(rcuda);
     for (int i = 0; i < triplo; i+=3) {
-        a[i] *= 24;
-        a[i+1] *= 24;
-        a[i+2] *= 24;
-    }
-}
-
-
-void computeAccelerations2() {
-    int i, j, triplo = 3*N;
-    double rij0, rij1, rij2, rSqd, rSqd3, f;
-    for (i = 0; i < triplo; i++)
-        a[i] = 0;
-    for (i = 0; i < triplo-3; i+=3) {
-        for (j = i+3; j < triplo; j+=3) {
-            rij0  = r[i] - r[j];
-            rij1  = r[i+1] - r[j+1];
-            rij2  = r[i+2] - r[j+2];
-            rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
-            rSqd3 = rSqd * rSqd * rSqd;
-            f     = rSqd3 * rSqd * (2 * rSqd3 - 1);
-            rij0  = rij0 * f;
-            rij1  = rij1 * f;
-            rij2  = rij2 * f;
-            a[j]   -= rij0;
-            a[j+1] -= rij1;
-            a[j+2] -= rij2;
-
-            a[i]   += rij0;
-            a[i+1] += rij1;
-            a[i+2] += rij2;
-        }
-    }
-    for (i = 0; i < triplo; i+=3) {
         a[i] *= 24;
         a[i+1] *= 24;
         a[i+2] *= 24;
