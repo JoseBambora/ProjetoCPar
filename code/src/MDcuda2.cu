@@ -27,7 +27,7 @@
 #include<stdlib.h>
 #include<math.h>
 #include<string.h>
-#include<omp.h>
+#include<cuda.h>
 
 
 // Number of particles
@@ -82,15 +82,53 @@ double MeanSquaredVelocity();
 //  Compute total kinetic energy from particle mass and velocities
 double Kinetic();
 
+
+__device__ double ourAtomicAdd(double* address, double val)
+{
+    unsigned long long int* address_as_ull =
+                              (unsigned long long int*)address;
+    unsigned long long int old = *address_as_ull, assumed;
+
+    do {
+        assumed = old;
+        old = atomicCAS(address_as_ull, assumed,
+                        __double_as_longlong(val +
+                               __longlong_as_double(assumed)));
+
+    // Note: uses integer comparison to avoid hang in case of NaN (since NaN != NaN)
+    } while (assumed != old);
+
+    return __longlong_as_double(old);
+}
+
+__device__ double ourAtomicSub(double* address, double val)
+{
+    unsigned long long int* address_as_ull =
+                              (unsigned long long int*)address;
+    unsigned long long int old = *address_as_ull, assumed;
+
+    do {
+        assumed = old;
+        old = atomicCAS(address_as_ull, assumed,
+                        __double_as_longlong(__longlong_as_double(assumed) - val));
+
+    // Note: uses integer comparison to avoid hang in case of NaN (since NaN != NaN)
+    } while (assumed != old);
+
+    return __longlong_as_double(old);
+}
+
+
 int main()
 {
     
     //  variable delcarations
     int i;
-    double dt, Vol, rho;
+    double dt, Vol, Temp, Press, Pavg, Tavg, rho;
     double VolFac, TempFac, PressFac, timefac;
-    char trash[10000], prefix[1000], tfn[1000], ofn[1000], afn[1000];
-    FILE *infp, *tfp, *ofp, *afp;
+    double KE, PE, mvs, gc, Z;
+    char prefix[1000], tfn[1000], ofn[1000], afn[1000];
+    FILE *tfp, *ofp, *afp;
     
     
     printf("\n  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
@@ -268,6 +306,7 @@ int main()
     //  Based on their positions, calculate the ininial intermolecular forces
     //  The accellerations of each particle will be defined from the forces and their
     //  mass, and this will allow us to update their positions via Newton's law
+    computeAccelerations();
     
     
     // Print number of particles to the trajectory file
@@ -275,16 +314,15 @@ int main()
     
     //  We want to calculate the average Temperature and Pressure for the simulation
     //  The variables need to be set to zero initially
-    double PavgArray[NumTime+1];
-    double TavgArray[NumTime+1];
+    Pavg = 0;
+    Tavg = 0;
     
     
     int tenp = floor(NumTime/10);
     fprintf(ofp,"  time (s)              T(t) (K)              P(t) (Pa)           Kinetic En. (n.u.)     Potential En. (n.u.) Total En. (n.u.)\n");
     printf("  PERCENTAGE OF CALCULATION COMPLETE:\n  [");
-    double Pavg = 0, Tavg = 0;
-    computeAccelerations();
     for (i=0; i<NumTime+1; i++) {
+        
         //  This just prints updates on progress of the calculation for the users convenience
         if (i==tenp) printf(" 10 |");
         else if (i==2*tenp) printf(" 20 |");
@@ -302,36 +340,41 @@ int main()
         // This updates the positions and velocities using Newton's Laws
         // Also computes the Pressure as the sum of momentum changes from wall collisions / timestep
         // which is a Kinetic Theory of gasses concept of Pressure
-        double Press = VelocityVerlet(dt, i+1, tfp);
+        Press = VelocityVerlet(dt, i+1, tfp);
         Press *= PressFac;
+        
         //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //  Now we would like to calculate somethings about the system:
         //  Instantaneous mean velocity squared, Temperature, Pressure
         //  Potential, and Kinetic Energy
         //  We would also like to use the IGL to try to see if we can extract the gas constant
-        double mvs = MeanSquaredVelocity();
-        double KE = Kinetic();
-        double PE = Potential();
+        mvs = MeanSquaredVelocity();
+        KE = Kinetic();
+        PE = Potential();
         
         // Temperature from Kinetic Theory
-        double Temp = m*mvs/(3*kB) * TempFac;
+        Temp = m*mvs/(3*kB) * TempFac;
         
         // Instantaneous gas constant and compressibility - not well defined because
         // pressure may be zero in some instances because there will be zero wall collisions,
         // pressure may be very high in some instances because there will be a number of collisions
-        // private gc, z
-        double gc = NA*Press*(Vol*VolFac)/(N*Temp);
-        double Z  = Press*(Vol*VolFac)/(N*kBSI*Temp);
+        gc = NA*Press*(Vol*VolFac)/(N*Temp);
+        Z  = Press*(Vol*VolFac)/(N*kBSI*Temp);
+        
         Tavg += Temp;
         Pavg += Press;
+        
         fprintf(ofp,"  %8.4e  %20.8f  %20.8f %20.8f  %20.8f  %20.8f \n",i*dt*timefac,Temp,Press,KE, PE, KE+PE);
+        
+        
     }
+    
     // Because we have calculated the instantaneous temperature and pressure,
     // we can take the average over the whole simulation here
     Pavg /= NumTime;
     Tavg /= NumTime;
-    double Z = Pavg*(Vol*VolFac)/(N*kBSI*Tavg);
-    double gc = NA*Pavg*(Vol*VolFac)/(N*Tavg);
+    Z = Pavg*(Vol*VolFac)/(N*kBSI*Tavg);
+    gc = NA*Pavg*(Vol*VolFac)/(N*Tavg);
     fprintf(afp,"  Total Time (s)      T (K)               P (Pa)      PV/nT (J/(mol K))         Z           V (m^3)              N\n");
     fprintf(afp," --------------   -----------        ---------------   --------------   ---------------   ------------   -----------\n");
     fprintf(afp,"  %8.4e  %15.5f       %15.5f     %10.5f       %10.5f        %10.5e         %i\n",i*dt*timefac,Tavg,Pavg,gc,Z,Vol*VolFac,N);
@@ -436,94 +479,124 @@ double Kinetic() { //Write Function here!
     return m*kin/2.;
 }
 
-double PotentialMath(double sub1, double sub2, double sub3)
+__device__ double PotentialMath(double sub1, double sub2, double sub3,double sigma)
 {
     double quot = sigma * sigma / (sub1 * sub1 + sub2 * sub2 + sub3 * sub3);
     double quot6 = quot * quot * quot;
     return quot6 * quot6 - quot6;
 }
 
-// Function to calculate the potential energy of the system
-double Potential() {
-    int j, i, triplo = 3*N;
-    double Pot = 0.0;
-    # pragma omp parallel 
-    # pragma omp for reduction(+:Pot)
-    for (i=0; i<triplo; i+=3) {
-        for (j=0; j<i; j+=3)
-            Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
-        for (j=i+3; j < triplo; j+=3)
-            Pot += PotentialMath(r[i]-r[j],r[i+1]-r[j+1],r[i+2]-r[j+2]);
+__device__ double PotentialDivisionAux(double *rcuda,int liminf, int limsup, int i,double sigma) 
+{
+    double Pot = 0;
+    for (int j=liminf; j < limsup; j+=3)
+        Pot += PotentialMath(rcuda[i]-rcuda[j],rcuda[i+1]-rcuda[j+1],rcuda[i+2]-rcuda[j+2],sigma);
+    return Pot;
+}
+
+__global__ void PotentialDivision(double *rcuda, double *result, int N,double sigma) {
+    int id_original = blockIdx.x * blockDim.x + threadIdx.x;
+    if(id_original < N * 2)
+    {
+        int id = id_original >> 1;
+        int triplo = 3 *N;
+        int i = id*3;
+        double Pot;
+        if(id_original%2 == 0)
+            Pot = PotentialDivisionAux(rcuda,0,i,i,sigma); 
+        else
+            Pot = PotentialDivisionAux(rcuda,i+3,triplo,i,sigma);
+        ourAtomicAdd(result, Pot);
     }
+}
+
+
+double Potential() {
+    int num_blocks = 126;
+    int num_threads_per_block = 126;
+    double *rcuda, *potcuda, Pot = 0;
+    int bytes = N * 3 * sizeof(double);
+    cudaMalloc((void**) &rcuda, bytes);
+    cudaMalloc((void**) &potcuda, sizeof(double));
+    cudaMemcpy(rcuda, r, bytes, cudaMemcpyHostToDevice);
+    cudaMemset(potcuda,0,sizeof(double));
+    PotentialDivision<<<num_blocks,num_threads_per_block>>>(rcuda,potcuda,N,sigma);
+    cudaMemcpy(&Pot, potcuda, sizeof(double), cudaMemcpyDeviceToHost);
+    cudaFree(rcuda);
+    cudaFree(potcuda);
     return 4 * epsilon * Pot;
 }
 
-//   Uses the derivative of the Lennard-Jones potential to calculate
-//   the forces on each atom.  Then uses a = F/m to calculate the
-//   accelleration of each atom.
-void computeAccelerationsAux(int liminf, int limsup, double *array) {
-    int triplo = 3*N;
-    for (int i = liminf; i < limsup; i+=3) {
-        for (int j = i+3; j < triplo; j+=3) {
-            double rij0  = r[i] - r[j];
-            double rij1  = r[i+1] - r[j+1];
-            double rij2  = r[i+2] - r[j+2];
+__device__ void computeAccelerationsDivisionAux(double *rcuda,double *acuda, int liminf, int limsup, int i) {
+    if(liminf < limsup)
+    {
+        double ai0 = 0, ai1 = 0, ai2 = 0;
+        for (int j = liminf; j < limsup; j+=3) {
+            double rij0  = rcuda[i]   - rcuda[j];
+            double rij1  = rcuda[i+1] - rcuda[j+1];
+            double rij2  = rcuda[i+2] - rcuda[j+2];
             double rSqd  = 1 / (rij0 * rij0 + rij1 * rij1 + rij2 * rij2);
             double rSqd3 = rSqd * rSqd * rSqd;
             double f     = rSqd3 * rSqd * (2 * rSqd3 - 1);
             rij0  = rij0 * f;
             rij1  = rij1 * f;
             rij2  = rij2 * f;
-            array[j]   -= rij0;
-            array[j+1] -= rij1;
-            array[j+2] -= rij2;
-            array[i]   += rij0;
-            array[i+1] += rij1;
-            array[i+2] += rij2;
-        }
+            ourAtomicSub(&acuda[j],rij0);
+            ourAtomicSub(&acuda[j+1],rij1);
+            ourAtomicSub(&acuda[j+2],rij2);
+            ai0 += rij0;
+            ai1 += rij1;
+            ai2 += rij2;
+        } 
+        ourAtomicAdd(&acuda[i],ai0);
+        ourAtomicAdd(&acuda[i+1],ai1);
+        ourAtomicAdd(&acuda[i+2],ai2);
+    }
+}
+
+__global__ void computeAccelerationsDivision(double *rcuda, double *acuda, int N){
+    int id_original = blockIdx.x * blockDim.x + threadIdx.x;
+    if (id_original < (N*2 - 1)) {
+        int id = id_original >> 1;
+        int triplo = 3 *N;
+        int i = id * 3;
+        int dif = (triplo + (i+3)) >> 1;
+        int limite = dif - dif % 3;
+        if(id_original%2 == 0)
+            computeAccelerationsDivisionAux(rcuda,acuda,i+3,limite,i);
+        else
+            computeAccelerationsDivisionAux(rcuda,acuda,limite,triplo,i);
     }
 }
 
 void computeAccelerations() {
-    int triplo = 3*N;
-    int number_threads = omp_get_num_threads();
-    double *aaux[number_threads];
-    for(int i = 0 ; i < number_threads; i++)
-        aaux[i] = (double*)calloc(MAXPART*3, sizeof(double));
-    int intervalo = triplo / number_threads;
-    # pragma omp parellel
-    # pragma omp for
-    for(int i = 0 ; i < number_threads; i++) {
-        int liminf = i*intervalo;
-        int limsup = liminf+intervalo;
-        limsup = limsup == triplo ? limsup - 3 : limsup;
-        computeAccelerationsAux(liminf,limsup,aaux[i]);
-    }
-    # pragma omp parellel
-    # pragma omp for
+    int triplo = 3 * N;
+    int num_blocks = 126;
+    int num_threads_per_block = 126;
+    double *rcuda,*acuda;
+    int bytes   = N * 3 * sizeof(double);
+    cudaMalloc((void**) &rcuda, bytes);
+    cudaMalloc((void**) &acuda, bytes);
+    cudaMemcpy(rcuda, r, bytes, cudaMemcpyHostToDevice);
+    cudaMemset(acuda, 0, bytes);
+    computeAccelerationsDivision<<<num_threads_per_block,num_blocks>>>(rcuda,acuda,N);
+    cudaMemcpy(a, acuda, bytes, cudaMemcpyDeviceToHost);
+    cudaFree(acuda);
+    cudaFree(rcuda);
     for (int i = 0; i < triplo; i+=3) {
-        double ai0 = 0;
-        double ai1 = 0;
-        double ai2 = 0;
-        for(int j = 0 ; j < number_threads; j++) {
-            ai0 += aaux[j][i];
-            ai1 += aaux[j][i+1];
-            ai2 += aaux[j][i+2];
-        }
-        a[i]   = 24 * ai0;
-        a[i+1] = 24 * ai1;
-        a[i+2] = 24 * ai2;
+        a[i] *= 24;
+        a[i+1] *= 24;
+        a[i+2] *= 24;
     }
-    # pragma omp parellel
-    # pragma omp for
-    for(int i = 0 ; i < number_threads; i++)
-        free(aaux[i]);
 }
+
 
 // returns sum of dv/dt*m/A (aka Pressure) from elastic collisions with walls
 double VelocityVerlet(double dt, int iter, FILE *fp) {
-    int i, j, k, triplo = 3*N;
+    int i, triplo = 3*N;
+    
     double psum = 0.;
+    
     //  Compute accelerations from forces at current position
     // this call was removed (commented) for predagogical reasons
     //computeAccelerations();
