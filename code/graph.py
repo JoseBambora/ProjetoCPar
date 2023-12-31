@@ -75,10 +75,54 @@ def x4(df2500,df5000,df10000,df20000):
     plt.tight_layout()
     plt.show()
 
+def fun_speed_up(avg_seq,avg):
+    return [e[0] / e[1] for e in zip(avg_seq,avg)]
+
+def plot_points_comparison_and_speed_up(df2500, df5000, df10000, df20000):
+    ordem = [2500, 5000, 10000, 20000]
+
+    avg_seq      = [ df2500.mean()['seq']     , df5000.mean()['seq']     , df10000.mean()['seq']     , df20000.mean()['seq']     ]
+    avg_par      = [ df2500.mean()['par']     , df5000.mean()['par']     , df10000.mean()['par']     , df20000.mean()['par']     ]
+    avg_cuda     = [ df2500.mean()['cuda']    , df5000.mean()['cuda']    , df10000.mean()['cuda']    , df20000.mean()['cuda']    ]
+    avg_cuda_opt = [ df2500.mean()['cuda_opt'], df5000.mean()['cuda_opt'], df10000.mean()['cuda_opt'], df20000.mean()['cuda_opt']]
+
+    avg_par_speed_up      = fun_speed_up(avg_seq, avg_par)
+    avg_cuda_speed_up     = fun_speed_up(avg_seq, avg_cuda)
+    avg_cuda_opt_speed_up = fun_speed_up(avg_seq, avg_cuda_opt)
+
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(ordem, avg_seq, linestyle='--', marker='o', color='red', label="Sequential")
+    plt.plot(ordem, avg_par, linestyle='--', marker='o', color='lime', label="Open MP")
+    plt.plot(ordem, avg_cuda, linestyle='--', marker='o', color='blue', label="Cuda v1")
+    plt.plot(ordem, avg_cuda_opt, linestyle='--', marker='o', color='orange', label="Cuda v2")
+
+    plt.xticks(ordem)
+    plt.xlabel('N')
+    plt.ylabel('Time')
+    plt.title('Performance comparison - Time')
+
+    plt.subplot(1, 2, 2)
+    plt.plot(ordem, avg_par_speed_up, linestyle='--', marker='o', color='lime', label="Open MP")
+    plt.plot(ordem, avg_cuda_speed_up, linestyle='--', marker='o', color='blue', label="Cuda v1")
+    plt.plot(ordem, avg_cuda_opt_speed_up, linestyle='--', marker='o', color='orange', label="Cuda v2")
+
+    plt.xticks(ordem)
+    plt.xlabel('N')
+    plt.ylabel('Speed up')
+    plt.title('Performance comparison - Speed up')
+
+    plt.tight_layout()
+    plt.show()
+
 df2500  = pd.read_csv('timing_results_2500.csv' ,sep=';')
 df5000  = pd.read_csv('timing_results_5000.csv' ,sep=';')
 df10000 = pd.read_csv('timing_results_10000.csv',sep=';')
 df20000 = pd.read_csv('timing_results_20000.csv',sep=';')
+x2(df2500, df5000, df10000, df20000)
+plot_points_comparison_and_speed_up(df2500, df5000, df10000, df20000)
 
-x2(df2500,df5000,df10000,df20000)
+# plot_points_speed_up(df2500,df5000,df10000,df20000)
+
 
